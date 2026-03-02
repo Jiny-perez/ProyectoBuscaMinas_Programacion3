@@ -316,6 +316,12 @@
 	"HEADERS" : 
 	[
 		[
+			"C:/C++/Proyecto_Buscaminas/Cell.h",
+			"MU",
+			"EWIEGA46WW/moc_Cell.cpp",
+			null
+		],
+		[
 			"C:/C++/Proyecto_Buscaminas/mainwindow.h",
 			"MU",
 			"EWIEGA46WW/moc_mainwindow.cpp",
@@ -393,6 +399,7 @@
 	"SETTINGS_FILE" : "C:/C++/Proyecto_Buscaminas/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/Proyecto_Buscaminas_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
+		[ "C:/C++/Proyecto_Buscaminas/Cell.cpp", "MU", null ],
 		[ "C:/C++/Proyecto_Buscaminas/main.cpp", "MU", null ],
 		[ "C:/C++/Proyecto_Buscaminas/mainwindow.cpp", "MU", null ]
 	],
