@@ -1,0 +1,18 @@
+# Build (CMake/Qt Creator)
+build/
+build*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Qt Creator user files
+*.user
+*.user.*
+*.autosave
+
+# Qt / moc / rcc / ui
+*_autogen/
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
