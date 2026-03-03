@@ -1,18 +1,25 @@
-# Build (CMake/Qt Creator)
+# --- Build (CMake / Qt Creator) ---
 build/
-build*/
+build-*/
+cmake-build-*/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 Makefile
+compile_commands.json
 
-# Qt Creator user files
+# --- Qt Creator / IDE files ---
+.qtcreator/
 *.user
 *.user.*
 *.autosave
 
-# Qt / moc / rcc / ui
+# --- Qt generated (moc / rcc / ui / autogen) ---
 *_autogen/
 moc_*.cpp
 ui_*.h
 qrc_*.cpp
+
+# --- OS / misc ---
+.DS_Store
+Thumbs.db

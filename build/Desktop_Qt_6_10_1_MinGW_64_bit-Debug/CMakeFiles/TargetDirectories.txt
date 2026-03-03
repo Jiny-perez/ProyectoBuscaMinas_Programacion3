@@ -1,9 +1,0 @@
-C:/C++/Proyecto_Buscaminas/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/Proyecto_Buscaminas.dir
-C:/C++/Proyecto_Buscaminas/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
-C:/C++/Proyecto_Buscaminas/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
-C:/C++/Proyecto_Buscaminas/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
-C:/C++/Proyecto_Buscaminas/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/install.dir
-C:/C++/Proyecto_Buscaminas/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
-C:/C++/Proyecto_Buscaminas/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
-C:/C++/Proyecto_Buscaminas/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/Proyecto_Buscaminas_autogen_timestamp_deps.dir
-C:/C++/Proyecto_Buscaminas/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/Proyecto_Buscaminas_autogen.dir
