@@ -27,7 +27,7 @@ private:
     //Tamanio del tablero
     int rows, cols;
 
-    //Cantidad de bombas inicialles (ej: para 8x8 = 10)
+    //Cantidad de bombas inicialles (ej: grid 8x8 = 10)
     int bombsNumber;
     //Numero de casillas reveladas (ya sea por click de usuario o por expansion)
     int revealedNumber;
