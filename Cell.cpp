@@ -67,5 +67,5 @@ void Cell::setRevealed(bool revealed)
 }
 void Cell::setFlagged(bool flagged)
 {
-    this->revealed = revealed;
+    this->flagged = flagged;
 }

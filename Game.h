@@ -51,7 +51,7 @@ private:
     std::vector<Cell> grid;
 
     //Para asegurarse que el primer click no sea sobre una bomba
-    bool bombsPlaced;
+    bool firstClick;
 
 public:
     Game();
@@ -60,14 +60,17 @@ public:
     void init();
     void placeBombs(int idx);
 
-    int bombsAround(int idx)const;
+    int bombsAround(int idx);
     int index(int r, int c) const;
 
     bool toggleFlag(int idx);
-    bool hasBomb(int idx)const;
+    bool winCheck() const;
 
     RevealResult reveal(int idx);
+    void revealRecursive(int idx, RevealResult& revealResult);
     const Cell& getCell(int idx);
+
+    std::vector<int> neighborsIdx(int idx) const;
 
     int getRows() const;
     int getCols() const;
