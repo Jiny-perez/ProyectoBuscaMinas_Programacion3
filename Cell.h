@@ -3,7 +3,6 @@
 class Cell
 {
 private:
-    int x, y;
     int bombsAround;
 
     bool hasBomb;
@@ -15,8 +14,6 @@ public:
     Cell(int x, int y);
 
     //GETTERS
-    int getX() const;
-    int getY() const;
     int getBombsAround() const;
 
     bool isBomb() const;
@@ -24,8 +21,6 @@ public:
     bool isFlagged() const;
 
     //SETTERS
-    void setX(int x);
-    void setY(int y);
     void setBombsAround(int bombsAround);
 
     void setHasBomb(bool hasBomb);

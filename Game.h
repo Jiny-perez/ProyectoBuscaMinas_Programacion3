@@ -12,7 +12,7 @@ public:
     enum class RevealOutcome {
         NA,       //Ya esta revelada o tiene bandera
         REVEALED, //No tiene bomba
-        MINE,     //Tiene bomba
+        BOMB,     //Tiene bomba
         WON       //Gano
     };
 

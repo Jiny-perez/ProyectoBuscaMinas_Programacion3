@@ -67,8 +67,8 @@ int Game::bombsAround(int idx) {
 }
 
 
-int Game::index(int r, int c) const{
-    return (r * cols) + c;
+int Game::index(int row, int column) const{
+    return (row * cols) + column;
 }
 
 bool Game::toggleFlag(int idx){
@@ -115,7 +115,7 @@ Game::RevealResult Game::reveal(int idx)
 
     revealRecursive(idx, revealResult);
 
-    if(revealResult.outcome != RevealOutcome::MINE && winCheck())
+    if(revealResult.outcome != RevealOutcome::BOMB && winCheck())
         revealResult.outcome = RevealOutcome::WON;
 
     return revealResult;
@@ -126,7 +126,7 @@ void Game::revealRecursive(int idx, RevealResult& revealResult)
     if (idx < 0 || idx >= rows * cols)
         return;
 
-    if (revealResult.outcome == RevealOutcome::MINE)
+    if (revealResult.outcome == RevealOutcome::BOMB)
         return;
 
     if(grid[idx].isFlagged())
@@ -140,7 +140,7 @@ void Game::revealRecursive(int idx, RevealResult& revealResult)
 
     if(grid[idx].isBomb())
     {
-        revealResult.outcome = RevealOutcome::MINE;
+        revealResult.outcome = RevealOutcome::BOMB;
         return;
     }
 
@@ -186,7 +186,5 @@ std::vector<int> Game::neighborsIdx(int idx) const
 
 bool Game::winCheck() const
 {
-    if(revealedNumber == (rows*cols)-bombsNumber)
-        return true;
-    return false;
+    return revealedNumber == (rows*cols)-bombsNumber;
 }
