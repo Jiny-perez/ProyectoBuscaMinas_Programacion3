@@ -3,27 +3,26 @@
 class Cell
 {
 private:
-    int bombsAround;
+    int minesAround;
 
-    bool hasBomb;
+    bool hasMine;
     bool revealed;
     bool flagged;
 
 public:
     Cell();
-    Cell(int x, int y);
 
     //GETTERS
-    int getBombsAround() const;
+    int setMinesAround() const;
 
-    bool isBomb() const;
+    bool isMine() const;
     bool isRevealed() const;
     bool isFlagged() const;
 
     //SETTERS
-    void setBombsAround(int bombsAround);
+    void setMinesAround(int minesAround);
 
-    void setHasBomb(bool hasBomb);
+    void setHasMine(bool hasMine);
     void setRevealed(bool revealed);
     void setFlagged(bool flagged);
 };

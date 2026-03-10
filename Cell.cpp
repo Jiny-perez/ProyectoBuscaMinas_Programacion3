@@ -1,21 +1,19 @@
 #include "Cell.h"
 
-Cell::Cell()
+Cell::Cell() :
+    minesAround(0), hasMine(false),
+    revealed(false), flagged(false)
 {
-    bombsAround = 0;
-    hasBomb = false;
-    revealed = false;
-    flagged = false;
 }
 
 
-int Cell::getBombsAround() const
+int Cell::setMinesAround() const
 {
-    return bombsAround;
+    return minesAround;
 }
-bool Cell::isBomb() const
+bool Cell::isMine() const
 {
-    return hasBomb;
+    return hasMine;
 }
 bool Cell::isRevealed() const
 {
@@ -27,13 +25,13 @@ bool Cell::isFlagged() const
 }
 
 
-void Cell::setBombsAround(int bombsAround)
+void Cell::setMinesAround(int minesAround)
 {
-    this->bombsAround = bombsAround;
+    this->minesAround = minesAround;
 }
-void Cell::setHasBomb(bool hasBomb)
+void Cell::setHasMine(bool hasMine)
 {
-    this->hasBomb = hasBomb;
+    this->hasMine = hasMine;
 }
 void Cell::setRevealed(bool revealed)
 {

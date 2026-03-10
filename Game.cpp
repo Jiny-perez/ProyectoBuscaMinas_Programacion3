@@ -1,45 +1,59 @@
 #include "Game.h"
 
 #include <cstdlib>
-#include <ctime>
 
-void Game::placeBombs(int idx){
-    srand(time(0));
+Game::Game() : rows(0), cols(0),
+    minesNumber(0), revealedNumber(0),
+    flagsPlaced(0), firstClick(true)
+{
+}
 
-    if(bombsNumber<=0){
+Game::Game(int rows, int cols, int minesNumber) :
+    rows(rows), cols(cols), minesNumber(minesNumber),
+    revealedNumber(0), flagsPlaced(0), firstClick(true)
+{
+    grid.assign(rows * cols, Cell{});
+}
+
+void Game::placeMines(int idx){
+
+    if(minesNumber<=0){
         return;
     }
 
-    int bombsPlaced = 0;
+    int minesPlaced = 0;
     int size = rows * cols;
 
-    while(bombsPlaced < bombsNumber){
-        int bomb = rand() % size;
+    while(minesPlaced < minesNumber){
+        int mine = rand() % size;
 
-        if(bomb == idx){
+        if(mine == idx){
             continue;
         }
 
-        if(grid[bomb].isBomb()){
+        if(grid[mine].isMine()){
             continue;
         }
 
-        grid[bomb].setHasBomb(true);
-        bombsPlaced++;
+        grid[mine].setHasMine(true);
+        minesPlaced++;
     }
 
     firstClick = false;
 }
 
-int Game::bombsAround(int idx) {
-    if(grid[idx].isBomb()){
+int Game::minesAround(int idx) const {
+    if(!isIdxValid(idx))
+        return 0;
+
+    if(grid[idx].isMine()){
         return 0;
     }
 
     int rowIdx = idx / cols;
     int columnIdx = idx % cols;
 
-    int counterBombsAround=0;
+    int counterMinesAround=0;
 
     for(int dirRows = -1; dirRows <= 1; dirRows++){
         for(int dirCols = -1; dirCols <= 1; dirCols++){
@@ -54,16 +68,16 @@ int Game::bombsAround(int idx) {
             if(newRows >= 0 && newRows < rows){
                 if(newCols >= 0 && newCols < cols){
 
-                    int bombIdx = newRows * cols + newCols;
-                    if(grid[bombIdx].isBomb()){
-                        counterBombsAround++;
+                    int mineIdx = newRows * cols + newCols;
+                    if(grid[mineIdx].isMine()){
+                        counterMinesAround++;
                     }
 
                 }
             }
         }
     }
-    return counterBombsAround;
+    return counterMinesAround;
 }
 
 
@@ -72,6 +86,9 @@ int Game::index(int row, int column) const{
 }
 
 bool Game::toggleFlag(int idx){
+    if(!isIdxValid(idx))
+        return false;
+
     if(grid[idx].isRevealed()){
         return false;
     }
@@ -80,6 +97,9 @@ bool Game::toggleFlag(int idx){
         grid[idx].setFlagged(false);
         flagsPlaced--;
     }else{
+        if(flagsPlaced >= minesNumber)
+            return false;
+
         grid[idx].setFlagged(true);
         flagsPlaced++;
     }
@@ -87,26 +107,26 @@ bool Game::toggleFlag(int idx){
     return true;
 }
 
-const Cell& Game::getCell(int idx)
+const Cell& Game::getCell(int idx) const
 {
-    return grid[idx];
+    return grid.at(idx);
 }
 
 Game::RevealResult Game::reveal(int idx)
 {
     RevealResult revealResult{RevealOutcome::NA, {}};
 
-    if (idx < 0 || idx >= rows * cols)
+    if (!isIdxValid(idx))
         return revealResult;
 
     if(firstClick)
     {
-        placeBombs(idx);
+        placeMines(idx);
 
         for(int i = 0; i < rows * cols; i++)
         {
-            int adjacentBombs = bombsAround(i);
-            grid[i].setBombsAround(adjacentBombs);
+            int minesAround = minesAround(i);
+            grid[i].setMinesAround(minesAround);
         }
     }
 
@@ -123,7 +143,7 @@ Game::RevealResult Game::reveal(int idx)
 
 void Game::revealRecursive(int idx, RevealResult& revealResult)
 {
-    if (idx < 0 || idx >= rows * cols)
+    if (!isIdxValid(idx))
         return;
 
     if (revealResult.outcome == RevealOutcome::BOMB)
@@ -138,7 +158,7 @@ void Game::revealRecursive(int idx, RevealResult& revealResult)
     grid[idx].setRevealed(true);
     revealResult.changed.push_back(idx);
 
-    if(grid[idx].isBomb())
+    if(grid[idx].isMine())
     {
         revealResult.outcome = RevealOutcome::BOMB;
         return;
@@ -147,7 +167,7 @@ void Game::revealRecursive(int idx, RevealResult& revealResult)
     revealResult.outcome = RevealOutcome::REVEALED;
     revealedNumber++;
 
-    if(grid[idx].getBombsAround() > 0)
+    if(grid[idx].setMinesAround() > 0)
         return;
 
     for(int n : neighborsIdx(idx))
@@ -156,6 +176,9 @@ void Game::revealRecursive(int idx, RevealResult& revealResult)
 
 std::vector<int> Game::neighborsIdx(int idx) const
 {
+    if (!isIdxValid(idx))
+        return {};
+
     std::vector<int> neighbors;
     neighbors.reserve(8);
 
@@ -186,5 +209,10 @@ std::vector<int> Game::neighborsIdx(int idx) const
 
 bool Game::winCheck() const
 {
-    return revealedNumber == (rows*cols)-bombsNumber;
+    return revealedNumber == (rows*cols)-minesNumber;
+}
+
+bool Game::isIdxValid(int idx) const
+{
+    return idx >= 0 && idx < rows * cols;
 }
