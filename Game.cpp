@@ -2,23 +2,51 @@
 
 #include <cstdlib>
 
-Game::Game() : rows(0), cols(0),
-    minesNumber(0), revealedNumber(0),
-    flagsPlaced(0), firstClick(true)
+Game::Game(Difficulty difficulty) : revealedNumber(0),flagsPlaced(0),
+    firstClick(true), rndProvider(RandomProvider{})
 {
+    start(difficulty);
 }
 
-Game::Game(int rows, int cols, int minesNumber) :
-    rows(rows), cols(cols), minesNumber(minesNumber), revealedNumber(0),
-    flagsPlaced(0), firstClick(true), rndProvider(RandomProvider{})
+Game::Game(Difficulty difficulty, const RandomProvider& rndProvider) :
+    revealedNumber(0), flagsPlaced(0), firstClick(true), rndProvider(rndProvider)
 {
-    grid.assign(rows * cols, Cell{});
+    start(difficulty);
 }
 
-Game::Game(int rows, int cols, int minesNumber, const RandomProvider& rndProvider) :
-    rows(rows), cols(cols), minesNumber(minesNumber),revealedNumber(0),
-    flagsPlaced(0), firstClick(true), rndProvider(rndProvider)
+void Game::start(Difficulty difficulty)
 {
+    this->difficulty = difficulty;
+    revealedNumber = 0;
+    flagsPlaced = 0;
+    firstClick = true;
+    switch(difficulty)
+    {
+    case Difficulty::BEGINNER:
+        rows = 8;
+        cols = 8;
+        minesNumber = 10;
+        break;
+
+    case Difficulty::INTERMEDIATE:
+        rows = 16;
+        cols = 16;
+        minesNumber = 40;
+        break;
+
+    case Difficulty::EXPERT:
+        rows = 16;
+        cols = 30;
+        minesNumber = 99;
+        break;
+
+    default:
+        rows = 0;
+        cols = 0;
+        minesNumber = 0;
+        break;
+    }
+
     grid.assign(rows * cols, Cell{});
 }
 
@@ -178,7 +206,7 @@ void Game::revealRecursive(int idx, RevealResult& revealResult)
     revealResult.outcome = RevealOutcome::REVEALED;
     revealedNumber++;
 
-    if(grid[idx].setMinesAround() > 0)
+    if(grid[idx].getMinesAround() > 0)
         return;
 
     for(int n : neighborsIdx(idx))
@@ -229,6 +257,12 @@ bool Game::isIdxValid(int idx) const
 }
 
 //GETTERS
+
+Difficulty Game::getDifficulty() const
+{
+    return difficulty;
+}
+
 int Game::getRows() const{
     return rows;
 }

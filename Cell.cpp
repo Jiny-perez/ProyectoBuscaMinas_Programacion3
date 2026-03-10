@@ -7,7 +7,7 @@ Cell::Cell() :
 }
 
 
-int Cell::setMinesAround() const
+int Cell::getMinesAround() const
 {
     return minesAround;
 }

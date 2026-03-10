@@ -2,6 +2,7 @@
 
 #include "Cell.h"
 #include "RandomProvider.h"
+#include "Enums.h"
 
 #include <vector>
 
@@ -9,14 +10,6 @@ class Game
 {
 
 public:
-    //enum que guarda posibles resultados despues de presionar una casilla
-    enum class RevealOutcome {
-        NA,       //Ya esta revelada o tiene bandera
-        REVEALED, //No tiene minea
-        BOMB,     //Tiene minea
-        WON       //Gano
-    };
-
     struct RevealResult {
         RevealOutcome outcome;
         //Vector que guarda indices revelados en un click
@@ -25,6 +18,8 @@ public:
     };
 
 private:
+    Difficulty difficulty;
+
     RandomProvider rndProvider;
 
     //Tamanio del tablero
@@ -57,10 +52,10 @@ private:
     bool firstClick;
 
 public:
-    Game();
-    Game(int rows, int cols, int minesNumber);
-    Game(int rows, int cols, int minesNumber, const RandomProvider& rndProvider);
+    Game(Difficulty difficulty);
+    Game(Difficulty difficulty, const RandomProvider& rndProvider);
 
+    void start(Difficulty difficulty);
     void placeMines(int idx);
 
     int minesAround(int idx) const;
@@ -76,6 +71,7 @@ public:
 
     std::vector<int> neighborsIdx(int idx) const;
 
+    Difficulty getDifficulty() const;
     int getRows() const;
     int getCols() const;
     int getMinesNumber() const;
