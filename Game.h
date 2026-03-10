@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cell.h"
+#include "RandomProvider.h"
 
 #include <vector>
 
@@ -24,6 +25,8 @@ public:
     };
 
 private:
+    RandomProvider rndProvider;
+
     //Tamanio del tablero
     int rows, cols;
 
@@ -56,6 +59,7 @@ private:
 public:
     Game();
     Game(int rows, int cols, int minesNumber);
+    Game(int rows, int cols, int minesNumber, const RandomProvider& rndProvider);
 
     void placeMines(int idx);
 

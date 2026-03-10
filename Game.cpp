@@ -9,8 +9,15 @@ Game::Game() : rows(0), cols(0),
 }
 
 Game::Game(int rows, int cols, int minesNumber) :
-    rows(rows), cols(cols), minesNumber(minesNumber),
-    revealedNumber(0), flagsPlaced(0), firstClick(true)
+    rows(rows), cols(cols), minesNumber(minesNumber), revealedNumber(0),
+    flagsPlaced(0), firstClick(true), rndProvider(RandomProvider{})
+{
+    grid.assign(rows * cols, Cell{});
+}
+
+Game::Game(int rows, int cols, int minesNumber, const RandomProvider& rndProvider) :
+    rows(rows), cols(cols), minesNumber(minesNumber),revealedNumber(0),
+    flagsPlaced(0), firstClick(true), rndProvider(rndProvider)
 {
     grid.assign(rows * cols, Cell{});
 }
@@ -25,7 +32,7 @@ void Game::placeMines(int idx){
     int size = rows * cols;
 
     while(minesPlaced < minesNumber){
-        int mine = rand() % size;
+        int mine = rndProvider.nextInt(0, size);
 
         if(mine == idx){
             continue;
