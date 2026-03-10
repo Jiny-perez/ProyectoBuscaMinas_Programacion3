@@ -13,7 +13,7 @@ public:
     Cell();
 
     //GETTERS
-    int setMinesAround() const;
+    int getMinesAround() const;
 
     bool isMine() const;
     bool isRevealed() const;

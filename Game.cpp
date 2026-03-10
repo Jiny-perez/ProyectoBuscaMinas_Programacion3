@@ -23,16 +23,20 @@ Game::Game(int rows, int cols, int minesNumber, const RandomProvider& rndProvide
 }
 
 void Game::placeMines(int idx){
-
-    if(minesNumber<=0){
+    if(minesNumber <= 0){
+        firstClick = false;
         return;
     }
 
     int minesPlaced = 0;
     int size = rows * cols;
 
+    if(minesNumber > size - 1){
+        minesNumber = size - 1;
+    }
+
     while(minesPlaced < minesNumber){
-        int mine = rndProvider.nextInt(0, size);
+        int mine = rndProvider.nextInt(0, size - 1);
 
         if(mine == idx){
             continue;
@@ -222,4 +226,21 @@ bool Game::winCheck() const
 bool Game::isIdxValid(int idx) const
 {
     return idx >= 0 && idx < rows * cols;
+}
+
+//GETTERS
+int Game::getRows() const{
+    return rows;
+}
+
+int Game::getCols() const{
+    return cols;
+}
+
+int Game::getMinesNumber() const{
+    return minesNumber;
+}
+
+int Game::getFlagsPlaced() const{
+    return flagsPlaced;
 }
