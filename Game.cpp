@@ -3,51 +3,34 @@
 #include <cstdlib>
 
 Game::Game(Difficulty difficulty) : revealedNumber(0),flagsPlaced(0),
-    firstClick(true), rndProvider(RandomProvider{})
+    firstClick(true), rndProvider(RandomProvider{}), board ({0,0})
 {
     start(difficulty);
 }
 
 Game::Game(Difficulty difficulty, const RandomProvider& rndProvider) :
-    revealedNumber(0), flagsPlaced(0), firstClick(true), rndProvider(rndProvider)
+    revealedNumber(0), flagsPlaced(0), firstClick(true),
+    rndProvider(rndProvider), board({0,0})
 {
     start(difficulty);
 }
 
 void Game::start(Difficulty difficulty)
 {
+    board.reset(difficulty);
+
     this->difficulty = difficulty;
     revealedNumber = 0;
     flagsPlaced = 0;
+
     firstClick = true;
+
     switch(difficulty)
     {
-    case Difficulty::BEGINNER:
-        rows = 8;
-        cols = 8;
-        minesNumber = 10;
-        break;
-
-    case Difficulty::INTERMEDIATE:
-        rows = 16;
-        cols = 16;
-        minesNumber = 40;
-        break;
-
-    case Difficulty::EXPERT:
-        rows = 16;
-        cols = 30;
-        minesNumber = 99;
-        break;
-
-    default:
-        rows = 0;
-        cols = 0;
-        minesNumber = 0;
-        break;
+    case Difficulty::BEGINNER: minesNumber = 10; break;
+    case Difficulty::INTERMEDIATE: minesNumber = 40; break;
+    case Difficulty::EXPERT: minesNumber = 99; break;
     }
-
-    grid.assign(rows * cols, Cell{});
 }
 
 void Game::placeMines(int idx){
@@ -57,7 +40,7 @@ void Game::placeMines(int idx){
     }
 
     int minesPlaced = 0;
-    int size = rows * cols;
+    int size = board.getRows() * board.getColumns();
 
     if(minesNumber > size - 1){
         minesNumber = size - 1;
@@ -70,106 +53,58 @@ void Game::placeMines(int idx){
             continue;
         }
 
-        if(grid[mine].isMine()){
+        if(board.getCell(mine).isMine()){
             continue;
         }
 
-        grid[mine].setHasMine(true);
+        board.getCell(mine).setHasMine(true);
         minesPlaced++;
     }
 
     firstClick = false;
 }
 
-int Game::minesAround(int idx) const {
-    if(!isIdxValid(idx))
-        return 0;
-
-    if(grid[idx].isMine()){
-        return 0;
-    }
-
-    int rowIdx = idx / cols;
-    int columnIdx = idx % cols;
-
-    int counterMinesAround=0;
-
-    for(int dirRows = -1; dirRows <= 1; dirRows++){
-        for(int dirCols = -1; dirCols <= 1; dirCols++){
-
-            if(dirRows == 0 && dirCols == 0){
-                continue;
-            }
-
-            int newRows = rowIdx + dirRows;
-            int newCols = columnIdx + dirCols;
-
-            if(newRows >= 0 && newRows < rows){
-                if(newCols >= 0 && newCols < cols){
-
-                    int mineIdx = newRows * cols + newCols;
-                    if(grid[mineIdx].isMine()){
-                        counterMinesAround++;
-                    }
-
-                }
-            }
-        }
-    }
-    return counterMinesAround;
-}
-
-
-int Game::index(int row, int column) const{
-    return (row * cols) + column;
-}
-
 bool Game::toggleFlag(int idx){
-    if(!isIdxValid(idx))
+    if(!board.isIdxValid(idx))
         return false;
 
-    if(grid[idx].isRevealed()){
+    if(board.getCell(idx).isRevealed()){
         return false;
     }
 
-    if(grid[idx].isFlagged()){
-        grid[idx].setFlagged(false);
+    if(board.getCell(idx).isFlagged()){
+        board.getCell(idx).setFlagged(false);
         flagsPlaced--;
     }else{
         if(flagsPlaced >= minesNumber)
             return false;
 
-        grid[idx].setFlagged(true);
+        board.getCell(idx).setFlagged(true);
         flagsPlaced++;
     }
 
     return true;
 }
 
-const Cell& Game::getCell(int idx) const
-{
-    return grid.at(idx);
-}
-
 Game::RevealResult Game::reveal(int idx)
 {
     RevealResult revealResult{RevealOutcome::NA, {}};
 
-    if (!isIdxValid(idx))
+    if (!board.isIdxValid(idx))
         return revealResult;
 
     if(firstClick)
     {
         placeMines(idx);
 
-        for(int i = 0; i < rows * cols; i++)
+        for(int i = 0; i < board.getRows() * board.getColumns(); i++)
         {
-            int minesAround = minesAround(i);
-            grid[i].setMinesAround(minesAround);
+            int minesAround = board.minesAround(i);
+            board.getCell(i).setMinesAround(minesAround);
         }
     }
 
-    if(grid[idx].isFlagged() || grid[idx].isRevealed())
+    if(board.getCell(idx).isFlagged() || board.getCell(idx).isRevealed())
         return revealResult;
 
     revealRecursive(idx, revealResult);
@@ -182,22 +117,22 @@ Game::RevealResult Game::reveal(int idx)
 
 void Game::revealRecursive(int idx, RevealResult& revealResult)
 {
-    if (!isIdxValid(idx))
+    if (!board.isIdxValid(idx))
         return;
 
     if (revealResult.outcome == RevealOutcome::BOMB)
         return;
 
-    if(grid[idx].isFlagged())
+    if(board.getCell(idx).isFlagged())
         return;
 
-    if(grid[idx].isRevealed())
+    if(board.getCell(idx).isRevealed())
         return;
 
-    grid[idx].setRevealed(true);
+    board.getCell(idx).setRevealed(true);
     revealResult.changed.push_back(idx);
 
-    if(grid[idx].isMine())
+    if(board.getCell(idx).isMine())
     {
         revealResult.outcome = RevealOutcome::BOMB;
         return;
@@ -206,54 +141,16 @@ void Game::revealRecursive(int idx, RevealResult& revealResult)
     revealResult.outcome = RevealOutcome::REVEALED;
     revealedNumber++;
 
-    if(grid[idx].getMinesAround() > 0)
+    if(board.getCell(idx).getMinesAround() > 0)
         return;
 
-    for(int n : neighborsIdx(idx))
+    for(int n : board.neighborsIdx(idx))
         revealRecursive(n, revealResult);
-}
-
-std::vector<int> Game::neighborsIdx(int idx) const
-{
-    if (!isIdxValid(idx))
-        return {};
-
-    std::vector<int> neighbors;
-    neighbors.reserve(8);
-
-    int rowIdx = idx / cols;
-    int columnIdx = idx % cols;
-
-    for (int dirRow = -1; dirRow <= 1; ++dirRow)
-    {
-        for (int dirColumn = -1; dirColumn <= 1; ++dirColumn)
-        {
-
-            if (dirRow == 0 && dirColumn == 0)
-                continue;
-
-            int newRow = rowIdx + dirRow;
-            int newColumn = columnIdx + dirColumn;
-
-            if (newRow < 0 || newRow >= rows || newColumn < 0 || newColumn >= cols)
-                continue;
-
-            int neighborIdx = newRow * cols + newColumn;
-            neighbors.push_back(neighborIdx);
-        }
-    }
-
-    return neighbors;
 }
 
 bool Game::winCheck() const
 {
-    return revealedNumber == (rows*cols)-minesNumber;
-}
-
-bool Game::isIdxValid(int idx) const
-{
-    return idx >= 0 && idx < rows * cols;
+    return revealedNumber == (board.getRows()*board.getColumns())-minesNumber;
 }
 
 //GETTERS
@@ -261,14 +158,6 @@ bool Game::isIdxValid(int idx) const
 Difficulty Game::getDifficulty() const
 {
     return difficulty;
-}
-
-int Game::getRows() const{
-    return rows;
-}
-
-int Game::getCols() const{
-    return cols;
 }
 
 int Game::getMinesNumber() const{
