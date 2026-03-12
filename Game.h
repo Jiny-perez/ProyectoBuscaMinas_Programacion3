@@ -40,7 +40,7 @@ public:
     Game(Difficulty difficulty);
     Game(Difficulty difficulty, const RandomProvider& rndProvider);
 
-    void start(Difficulty difficulty);
+    void start(Difficulty difficulty);   
     void placeMines(int idx);
 
     bool toggleFlag(int idx);

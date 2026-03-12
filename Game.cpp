@@ -58,6 +58,13 @@ void Game::placeMines(int idx){
         }
 
         board.getCell(mine).setHasMine(true);
+
+        for(int neighbor : board.neighborsIdx(mine)){
+            if(!board.getCell(neighbor).isMine()){
+                (board.getCell(mine).incrementMinesAround();
+            }
+        }
+
         minesPlaced++;
     }
 
@@ -92,17 +99,6 @@ Game::RevealResult Game::reveal(int idx)
 
     if (!board.isIdxValid(idx))
         return revealResult;
-
-    if(firstClick)
-    {
-        placeMines(idx);
-
-        for(int i = 0; i < board.getRows() * board.getColumns(); i++)
-        {
-            int minesAround = board.minesAround(i);
-            board.getCell(i).setMinesAround(minesAround);
-        }
-    }
 
     if(board.getCell(idx).isFlagged() || board.getCell(idx).isRevealed())
         return revealResult;

@@ -19,10 +19,14 @@ public:
     bool isRevealed() const;
     bool isFlagged() const;
 
+
     //SETTERS
     void setMinesAround(int minesAround);
-
     void setHasMine(bool hasMine);
     void setRevealed(bool revealed);
     void setFlagged(bool flagged);
+
+    //Incrementación de minas
+    void incrementMinesAround();
 };
+

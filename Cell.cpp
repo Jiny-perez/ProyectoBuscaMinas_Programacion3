@@ -6,6 +6,10 @@ Cell::Cell() :
 {
 }
 
+void Cell::incrementMinesAround(){
+    minesAround++;
+}
+
 
 int Cell::getMinesAround() const
 {
