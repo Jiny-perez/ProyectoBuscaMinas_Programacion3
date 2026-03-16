@@ -135,15 +135,14 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
     }
 
     // Revelar la celda
-    auto result = game.reveal(idx);
-    auto& board = game.getBoard();
+    Game::RevealResult result = game.reveal(idx);
 
     // Actualizar todas las celdas reveladas
     for (int changedIdx : result.changed) {
         int f = changedIdx / columnas;
         int c = changedIdx % columnas;
         CellButton* btn = celdas[f][c];
-        const auto& cell = board.getCell(changedIdx);
+        const auto& cell = game.getBoard().getCell(changedIdx);
 
         if (cell.isMine()) {
             btn->setText("💣");
