@@ -53,4 +53,10 @@ public:
     int getMinesNumber() const;
     int getFlagsPlaced() const;
     int getFlagsRemaining() const;
+
+    bool isfirstClick() const;
+
+    Board &getBoard();
+    const Board& getBoard() const;
+
 };

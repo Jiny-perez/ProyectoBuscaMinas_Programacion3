@@ -61,7 +61,7 @@ void Game::placeMines(int idx){
 
         for(int neighbor : board.neighborsIdx(mine)){
             if(!board.getCell(neighbor).isMine()){
-                (board.getCell(mine).incrementMinesAround();
+                (board.getCell(neighbor).incrementMinesAround());
             }
         }
 
@@ -163,3 +163,16 @@ int Game::getMinesNumber() const{
 int Game::getFlagsPlaced() const{
     return flagsPlaced;
 }
+
+bool Game::isfirstClick() const{
+    return firstClick;
+}
+
+Board& Game::getBoard() {
+    return board;
+}
+
+const Board& Game::getBoard() const {
+    return board;
+}
+

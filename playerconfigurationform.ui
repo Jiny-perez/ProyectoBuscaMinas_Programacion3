@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PlayerConfigurationForm</class>
+ <widget class="QWidget" name="PlayerConfigurationForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>905</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QPushButton" name="btnRegresarMenu">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>450</y>
+     <width>411</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Regresar a menu </string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>20</y>
+     <width>591</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnJugar">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>170</y>
+     <width>411</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Jugar</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnRanking">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>310</y>
+     <width>411</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Ranking</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
