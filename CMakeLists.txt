@@ -36,6 +36,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Board.cpp
         gameform.h gameform.cpp gameform.ui
         playerconfigurationform.h playerconfigurationform.cpp playerconfigurationform.ui
+        ScoreEntry.h
+        RankingManager.h
+        RankingManager.cpp
 
     )
 # Define target properties for Android with Qt 6 as:

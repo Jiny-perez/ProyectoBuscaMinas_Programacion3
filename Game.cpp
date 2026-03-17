@@ -72,6 +72,7 @@ void Game::placeMines(int idx){
 }
 
 bool Game::toggleFlag(int idx){
+
     if(!board.isIdxValid(idx))
         return false;
 
@@ -166,6 +167,11 @@ int Game::getFlagsPlaced() const{
 
 bool Game::isfirstClick() const{
     return firstClick;
+}
+
+bool Game::isCellFlagged(int idx) const
+{
+    return board.getCell(idx).isFlagged();
 }
 
 Board& Game::getBoard() {

@@ -2,11 +2,14 @@
 #define GAMEFORM_H
 
 #include "Game.h"
+#include "RankingManager.h"
 
 #include <QDialog>
 #include <QPushButton>
 #include <QMouseEvent>
 #include <QVector>
+#include <QElapsedTimer>
+
 
 class CellButton : public QPushButton
 {
@@ -48,8 +51,17 @@ private:
     QVector<QVector<CellButton*>> celdas;
     int filas;
     int columnas;
+
     bool modoTodos;
+
     int nivelActual;
+
+    RankingManager rankingMng;
+    QElapsedTimer timer;
+    bool timerStarted;
+    long long elapsedTimeMs;
+
+    QString username;
 
     void crearTablero(int filas, int columnas);
 };

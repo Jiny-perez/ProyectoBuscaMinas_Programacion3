@@ -5,6 +5,7 @@
 #include <QRandomGenerator>
 #include <QMessageBox>
 #include <QFont>
+#include <iostream>
 
 // ── Botón de cada celda ──────────────────────
 CellButton::CellButton(int fila, int col, QWidget *parent)
@@ -22,12 +23,10 @@ void CellButton::mousePressEvent(QMouseEvent *event)
 
 // ── GameForm ─────────────────────────────────
 GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
-    : QDialog(parent), ui(new Ui::GameForm),
-    game(difficulty)
+    : QDialog(parent), ui(new Ui::GameForm), game(difficulty),
+    timerStarted(false), username(nombre), rankingMng(RankingManager{})
 {
     ui->setupUi(this);
-
-    game.start(difficulty);
 
     filas = game.getBoard().getRows();
     columnas = game.getBoard().getColumns();
@@ -77,7 +76,7 @@ void GameForm::crearTablero(int filas, int columnas)
 
     int tamCelda;
 
-    if (columnas == 32)
+    if (columnas == 30)
         tamCelda = 22;
     else if (columnas == 16)
         tamCelda = 30;
@@ -129,9 +128,20 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
     if (!celda->isEnabled())
         return;
 
+    if(game.isCellFlagged(idx))
+        return;
+
     //Colocar minas despues del primer click
     if (game.isfirstClick()) {
         game.placeMines(idx);
+
+        if(!timerStarted)
+        {
+            timer.start();
+            timerStarted = true;
+        }
+
+        std::cout << "\nMINAS: " << game.getMinesNumber() << "\n";
     }
 
     // Revelar la celda
@@ -144,12 +154,15 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
         CellButton* btn = celdas[f][c];
         const auto& cell = game.getBoard().getCell(changedIdx);
 
-        if (cell.isMine()) {
+        if (cell.isMine())
+        {
             btn->setText("💣");
             btn->setStyleSheet(
                 "QPushButton { background: #5c0a0a; border: 1px solid #ff4444; border-radius: 4px; }"
                 );
-        } else {
+        }
+        else
+        {
             int minasAlrededor = cell.getMinesAround();
             btn->setText(minasAlrededor > 0 ? QString::number(minasAlrededor) : "");
             btn->setStyleSheet(
@@ -160,11 +173,26 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
     }
 
     // Fin del juego
-    if (result.outcome == RevealOutcome::BOMB) {
+    if (result.outcome == RevealOutcome::BOMB)
+    {
         QMessageBox::information(this, "Fin del juego", "Perdiste");
-        if (parentWidget()) parentWidget()->show();
+        if (parentWidget()) parentWidget()->show();        
         this->close();
-    } else if (result.outcome == RevealOutcome::WON) {
+    }
+    else if (result.outcome == RevealOutcome::WON)
+    {
+        elapsedTimeMs = timer.elapsed();
+
+        ScoreEntry score;
+
+        score.username = username;
+        score.difficulty = game.getDifficulty();
+        score.timeMs = elapsedTimeMs;
+
+        rankingMng.saveScore(score);
+
+        std::cout << "\n" << elapsedTimeMs << "\n";
+
         QMessageBox::information(this, "Victoria", "Ganaste");
         if (parentWidget()) parentWidget()->show();
         this->close();
@@ -179,8 +207,13 @@ void GameForm::alHacerClickDerecho(int fila, int col)
     if (!celda->isEnabled())
         return;
 
-    if (celda->text().isEmpty())
-        celda->setText("🚩");
-    else
-        celda->setText("");
+    int idx = fila*columnas+col;
+
+    bool isFlagged = game.getBoard().getCell(idx).isFlagged();
+
+    if (!game.toggleFlag(idx))
+        return;
+
+    celda->setText(isFlagged ? "" : "🚩");
+
 }

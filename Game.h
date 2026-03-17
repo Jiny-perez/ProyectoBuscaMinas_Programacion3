@@ -55,6 +55,7 @@ public:
     int getFlagsRemaining() const;
 
     bool isfirstClick() const;
+    bool isCellFlagged(int idx) const;
 
     Board &getBoard();
     const Board& getBoard() const;

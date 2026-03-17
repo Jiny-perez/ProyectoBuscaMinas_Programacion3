@@ -54,7 +54,7 @@ void PlayerConfigurationForm::jugar()
         difficulty = Difficulty::EXPERT;
     }
 
-    GameForm *form = new GameForm(playerName, difficulty);
+    GameForm *form = new GameForm(playerName, difficulty, this);
     form->show();
     this->hide();
 }
