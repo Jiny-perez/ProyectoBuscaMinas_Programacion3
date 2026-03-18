@@ -26,9 +26,9 @@ void MainWindow::on_pushButton_clicked()
         return;
     }
 
-    PlayerConfigurationForm *form = new PlayerConfigurationForm(name);
+    PlayerConfigurationForm *form = new PlayerConfigurationForm(name, this);
     form->show();
-    this->close();
+    this->hide();
 }
 
 

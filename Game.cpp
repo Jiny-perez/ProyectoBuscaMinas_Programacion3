@@ -18,6 +18,7 @@ Game::Game(Difficulty difficulty, const RandomProvider& rndProvider) :
 void Game::start(Difficulty difficulty)
 {
     board.reset(difficulty);
+    minesPositions.clear();
 
     this->difficulty = difficulty;
     revealedNumber = 0;
@@ -58,6 +59,7 @@ void Game::placeMines(int idx){
         }
 
         board.getCell(mine).setHasMine(true);
+        minesPositions.push_back(mine);
 
         for(int neighbor : board.neighborsIdx(mine)){
             if(!board.getCell(neighbor).isMine()){
@@ -108,6 +110,16 @@ Game::RevealResult Game::reveal(int idx)
 
     if(revealResult.outcome != RevealOutcome::BOMB && winCheck())
         revealResult.outcome = RevealOutcome::WON;
+
+    if (revealResult.outcome == RevealOutcome::BOMB) {
+        for (int mineIdx : minesPositions) {
+            if (board.getCell(mineIdx).isRevealed())
+                continue;
+
+            board.getCell(mineIdx).setRevealed(true);
+            revealResult.changed.push_back(mineIdx);
+        }
+    }
 
     return revealResult;
 }

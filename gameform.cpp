@@ -2,7 +2,6 @@
 #include "ui_gameform.h"
 
 #include <QGridLayout>
-#include <QRandomGenerator>
 #include <QMessageBox>
 #include <QFont>
 #include <iostream>
@@ -19,6 +18,8 @@ void CellButton::mousePressEvent(QMouseEvent *event)
         emit clickIzquierdo(fila, col);
     else if (event->button() == Qt::RightButton)
         emit clickDerecho(fila, col);
+
+    QPushButton::mousePressEvent(event);
 }
 
 // ── GameForm ─────────────────────────────────
@@ -27,6 +28,8 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
     timerStarted(false), username(nombre), rankingMng(RankingManager{})
 {
     ui->setupUi(this);
+
+    setAttribute(Qt::WA_DeleteOnClose);
 
     filas = game.getBoard().getRows();
     columnas = game.getBoard().getColumns();
@@ -176,7 +179,8 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
     if (result.outcome == RevealOutcome::BOMB)
     {
         QMessageBox::information(this, "Fin del juego", "Perdiste");
-        if (parentWidget()) parentWidget()->show();        
+        if (parentWidget())
+            parentWidget()->show();
         this->close();
     }
     else if (result.outcome == RevealOutcome::WON)
@@ -194,7 +198,8 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
         std::cout << "\n" << elapsedTimeMs << "\n";
 
         QMessageBox::information(this, "Victoria", "Ganaste");
-        if (parentWidget()) parentWidget()->show();
+        if (parentWidget())
+            parentWidget()->show();
         this->close();
     }
 }
@@ -207,7 +212,7 @@ void GameForm::alHacerClickDerecho(int fila, int col)
     if (!celda->isEnabled())
         return;
 
-    int idx = fila*columnas+col;
+    int idx = fila*(game.getBoard().getColumns())+col;
 
     bool isFlagged = game.getBoard().getCell(idx).isFlagged();
 

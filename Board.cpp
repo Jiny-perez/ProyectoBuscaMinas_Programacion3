@@ -34,44 +34,6 @@ void Board::reset(Difficulty difficulty)
     grid.assign(getRows()*getColumns(), Cell{});
 }
 
-int Board::minesAround(int idx) const {
-    if(!isIdxValid(idx))
-        return 0;
-
-    if(getCell(idx).isMine()){
-        return 0;
-    }
-
-    int rowIdx = idx / getColumns();
-    int columnIdx = idx % getColumns();
-
-    int counterMinesAround=0;
-
-    for(int dirRows = -1; dirRows <= 1; dirRows++){
-        for(int dirCols = -1; dirCols <= 1; dirCols++){
-
-            if(dirRows == 0 && dirCols == 0){
-                continue;
-            }
-
-            int newRows = rowIdx + dirRows;
-            int newCols = columnIdx + dirCols;
-
-            if(newRows >= 0 && newRows < getRows()){
-                if(newCols >= 0 && newCols < getColumns()){
-
-                    int mineIdx = newRows * getColumns() + newCols;
-                    if(getCell(mineIdx).isMine()){
-                        counterMinesAround++;
-                    }
-
-                }
-            }
-        }
-    }
-    return counterMinesAround;
-}
-
 std::vector<int> Board::neighborsIdx(int idx) const
 {
     if (!isIdxValid(idx))

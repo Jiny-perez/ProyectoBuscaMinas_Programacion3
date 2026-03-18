@@ -22,7 +22,6 @@ public:
     int index(int row, int col) const;
     int getColumns() const;
     int getRows() const;
-    int minesAround(int idx) const;
 
     std::vector<int> neighborsIdx(int idx) const;
     std::vector<Cell>& getGrid();

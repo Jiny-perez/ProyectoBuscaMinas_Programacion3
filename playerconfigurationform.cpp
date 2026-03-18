@@ -14,6 +14,8 @@ PlayerConfigurationForm::PlayerConfigurationForm(QString name, QWidget *parent)
     ui->setupUi(this);
     ui->label->setText(playerName);
 
+    setAttribute(Qt::WA_DeleteOnClose);
+
     connect(ui->btnJugar, &QPushButton::clicked, this, &PlayerConfigurationForm::jugar);
     connect(ui->btnRanking, &QPushButton::clicked, this, &PlayerConfigurationForm::ranking);
     connect(ui->btnRegresarMenu, &QPushButton::clicked, this, &PlayerConfigurationForm::regresarAMenu);
@@ -65,9 +67,8 @@ void PlayerConfigurationForm::ranking(){
 
 void PlayerConfigurationForm::regresarAMenu()
 {
-    MainWindow *menuPrincipal = new MainWindow();
-    menuPrincipal->show();
-    this->close();
+    if (parentWidget())
+        parentWidget()->show();
+
+    close();
 }
-
-
