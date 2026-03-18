@@ -1,6 +1,7 @@
 #ifndef PLAYERCONFIGURATIONFORM_H
 #define PLAYERCONFIGURATIONFORM_H
 
+#include <QCloseEvent>
 #include <QDialog>
 #include <QString>
 
@@ -23,6 +24,9 @@ private slots:
 private:
     Ui::PlayerConfigurationForm *ui;
     QString playerName;
+    bool returningToParent = false;
+
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // PLAYERCONFIGURATIONFORM_H

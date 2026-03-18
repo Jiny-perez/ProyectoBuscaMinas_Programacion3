@@ -9,6 +9,7 @@
 #include <QMouseEvent>
 #include <QVector>
 #include <QElapsedTimer>
+#include <QCloseEvent>
 
 
 class CellButton : public QPushButton
@@ -61,9 +62,13 @@ private:
     bool timerStarted;
     long long elapsedTimeMs;
 
+    bool returningToWindow = false;
+
     QString username;
 
     void crearTablero(int filas, int columnas);
+
+    void closeEvent(QCloseEvent *event) override;
 };
 
 #endif // GAMEFORM_H

@@ -4,6 +4,7 @@
 #include "gameform.h"
 #include "mainwindow.h"
 
+#include <QApplication>
 #include <QtWidgets>
 
 PlayerConfigurationForm::PlayerConfigurationForm(QString name, QWidget *parent)
@@ -24,6 +25,16 @@ PlayerConfigurationForm::PlayerConfigurationForm(QString name, QWidget *parent)
 PlayerConfigurationForm::~PlayerConfigurationForm()
 {
     delete ui;
+}
+
+void PlayerConfigurationForm::closeEvent(QCloseEvent *event)
+{
+    if (!returningToParent) {
+        QApplication::quit();
+        return;
+    }
+
+    QDialog::closeEvent(event);
 }
 
 void PlayerConfigurationForm::jugar()
@@ -70,5 +81,6 @@ void PlayerConfigurationForm::regresarAMenu()
     if (parentWidget())
         parentWidget()->show();
 
+    returningToParent = true;
     close();
 }

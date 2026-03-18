@@ -4,6 +4,9 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QFont>
+#include <QApplication>
+#include <QCloseEvent>
+
 #include <iostream>
 
 // ── Botón de cada celda ──────────────────────
@@ -21,6 +24,17 @@ void CellButton::mousePressEvent(QMouseEvent *event)
 
     QPushButton::mousePressEvent(event);
 }
+
+void GameForm::closeEvent(QCloseEvent *event)
+{
+    if (!returningToWindow) {
+        QApplication::quit();
+        return;
+    }
+
+    QDialog::closeEvent(event);
+}
+
 
 // ── GameForm ─────────────────────────────────
 GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
@@ -181,6 +195,8 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
         QMessageBox::information(this, "Fin del juego", "Perdiste");
         if (parentWidget())
             parentWidget()->show();
+
+        returningToWindow = true;
         this->close();
     }
     else if (result.outcome == RevealOutcome::WON)
@@ -200,6 +216,7 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
         QMessageBox::information(this, "Victoria", "Ganaste");
         if (parentWidget())
             parentWidget()->show();
+        returningToWindow = true;
         this->close();
     }
 }
