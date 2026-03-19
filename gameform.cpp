@@ -42,14 +42,67 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
     timerStarted(false), username(nombre), rankingMng(RankingManager{})
 {
     ui->setupUi(this);
+    setFixedSize(1280, 760);
+
+    // Fondo general
+    this->setStyleSheet(
+        "QDialog {"
+        "    background-color: #08111f;"
+        "}"
+        "QWidget#GameForm {"
+        "    background-color: #08111f;"
+        "}"
+        "QWidget#boardContainer {"
+        "    background-color: transparent;"
+        "}"
+        );
+
+    ui->boardTitleLabel->setGeometry(280, 15, 940, 50);
+
+    ui->playerNameLabel->setGeometry(30, 155, 210, 45);
+    ui->difficultyLabel->setGeometry(30, 215, 210, 45);
+    ui->timerLabel->setGeometry(30, 275, 210, 45);
+
+    ui->boardContainer->setGeometry(280, 80, 940, 620);
+
+    ui->boardTitleLabel->setAlignment(Qt::AlignCenter);
+    ui->playerNameLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    ui->difficultyLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    ui->timerLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+
+    // Fuentes
+    QFont titleFont = ui->boardTitleLabel->font();
+    titleFont.setPointSize(24);
+    titleFont.setBold(true);
+    ui->boardTitleLabel->setFont(titleFont);
+
+    QFont infoFont = ui->playerNameLabel->font();
+    infoFont.setPointSize(15);
+    infoFont.setBold(true);
+    ui->playerNameLabel->setFont(infoFont);
+    ui->difficultyLabel->setFont(infoFont);
+    ui->timerLabel->setFont(infoFont);
 
     setAttribute(Qt::WA_DeleteOnClose);
+
+    connect(&updateTimer, &QTimer::timeout, this, [this]() {
+        qint64 elapsedMs = timer.elapsed();
+        int totalSeconds = elapsedMs / 1000;
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+
+        ui->timerLabel->setText(
+            QString("Tiempo: %1:%2")
+                .arg(minutes, 2, 10, QChar('0'))
+                .arg(seconds, 2, 10, QChar('0'))
+            );
+    });
 
     filas = game.getBoard().getRows();
     columnas = game.getBoard().getColumns();
 
-    ui->label->setText("Buscaminas " + QString::number(filas) + "x" + QString::number(columnas));
-    ui->label_2->setText("Jugador: " + nombre);
+    ui->boardTitleLabel->setText("Buscaminas " + QString::number(filas) + "x" + QString::number(columnas));
+    ui->playerNameLabel->setText("Jugador: " + nombre);
 
     QString difficultyText;
 
@@ -67,7 +120,8 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
         break;
     }
 
-    ui->label_3->setText("Nivel: " + difficultyText );
+    ui->difficultyLabel->setText("Nivel: " + difficultyText );
+    ui->timerLabel->setText("Tiempo: 00:00");
 
     crearTablero(filas, columnas);
 }
@@ -80,13 +134,13 @@ GameForm::~GameForm()
 // ── Crear tablero ────────────────────────────
 void GameForm::crearTablero(int filas, int columnas)
 {
-    if (ui->widget->layout() != nullptr)
-        delete ui->widget->layout();
+    if (ui->boardContainer->layout() != nullptr)
+        delete ui->boardContainer->layout();
 
     QGridLayout *grid = new QGridLayout();
     grid->setSpacing(2);
     grid->setAlignment(Qt::AlignCenter);
-    ui->widget->setLayout(grid);
+    ui->boardContainer->setLayout(grid);
 
     celdas.clear();
     celdas.resize(filas);
@@ -94,17 +148,17 @@ void GameForm::crearTablero(int filas, int columnas)
     int tamCelda;
 
     if (columnas == 30)
-        tamCelda = 22;
+        tamCelda = 28;
     else if (columnas == 16)
-        tamCelda = 30;
+        tamCelda = 34;
     else
-        tamCelda = 40;
+        tamCelda = 50;
 
     for (int i = 0; i < filas; i++) {
         celdas[i].resize(columnas);
 
         for (int j = 0; j < columnas; j++) {
-            CellButton *celda = new CellButton(i, j, ui->widget);
+            CellButton *celda = new CellButton(i, j, ui->boardContainer);
 
             celda->setFixedSize(tamCelda, tamCelda);
             celda->setFont(QFont("Segoe UI Emoji", tamCelda / 2));
@@ -156,6 +210,8 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
         {
             timer.start();
             timerStarted = true;
+
+            updateTimer.start();
         }
 
         std::cout << "\nMINAS: " << game.getMinesNumber() << "\n";
@@ -192,6 +248,8 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
     // Fin del juego
     if (result.outcome == RevealOutcome::BOMB)
     {
+        updateTimer.stop();
+
         QMessageBox::information(this, "Fin del juego", "Perdiste");
         if (parentWidget())
             parentWidget()->show();
@@ -201,6 +259,7 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
     }
     else if (result.outcome == RevealOutcome::WON)
     {
+        updateTimer.stop();
         elapsedTimeMs = timer.elapsed();
 
         ScoreEntry score;

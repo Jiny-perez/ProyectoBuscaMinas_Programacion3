@@ -10,6 +10,7 @@
 #include <QVector>
 #include <QElapsedTimer>
 #include <QCloseEvent>
+#include <QTimer>
 
 
 class CellButton : public QPushButton
@@ -61,6 +62,8 @@ private:
     QElapsedTimer timer;
     bool timerStarted;
     long long elapsedTimeMs;
+
+    QTimer updateTimer;
 
     bool returningToWindow = false;
 
