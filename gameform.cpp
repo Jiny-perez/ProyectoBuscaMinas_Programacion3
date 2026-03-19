@@ -66,6 +66,7 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
     ui->playerNameLabel->setGeometry(30, 155, 210, 45);
     ui->difficultyLabel->setGeometry(30, 215, 210, 45);
     ui->timerLabel->setGeometry(30, 275, 210, 45);
+    ui->backButton->setGeometry(30, 340, 210, 52);
 
     ui->boardContainer->setGeometry(280, 80, 940, 620);
 
@@ -87,7 +88,27 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
     ui->difficultyLabel->setFont(infoFont);
     ui->timerLabel->setFont(infoFont);
 
+    QString buttonStyle =
+        "QPushButton {"
+        "    background-color: #5b21b6;"
+        "    color: white;"
+        "    border: 2px solid #a855f7;"
+        "    border-radius: 14px;"
+        "}"
+        "QPushButton:hover {"
+        "    background-color: #7c3aed;"
+        "    border: 2px solid #c084fc;"
+        "}"
+        "QPushButton:pressed {"
+        "    background-color: #581c87;"
+        "}";
+
+    ui->backButton->setStyleSheet(buttonStyle);
+    ui->backButton->setFont(infoFont);
+
     setAttribute(Qt::WA_DeleteOnClose);
+
+    connect(ui->backButton, &QPushButton::clicked, this, &GameForm::regresar);
 
     connect(&updateTimer, &QTimer::timeout, this, [this]() {
         qint64 elapsedMs = timer.elapsed();
@@ -133,6 +154,17 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
 GameForm::~GameForm()
 {
     delete ui;
+}
+
+void GameForm::regresar()
+{
+    updateTimer.stop();
+
+    if (parentWidget())
+        parentWidget()->show();
+
+    returningToWindow = true;
+    close();
 }
 
 // ── Crear tablero ────────────────────────────
