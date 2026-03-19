@@ -48,7 +48,6 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
     ui->setupUi(this);
     setFixedSize(1280, 760);
 
-    // Fondo general
     this->setStyleSheet(
         "QDialog {"
         "    background-color: #08111f;"
@@ -61,23 +60,22 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
         "}"
         );
 
-    ui->boardTitleLabel->setGeometry(280, 15, 940, 50);
+    ui->boardTitleLabel->setGeometry(280, 15, 500, 54);
+    ui->timerLabel->setGeometry(945, 15, 210, 54);
 
     ui->playerNameLabel->setGeometry(30, 155, 210, 45);
     ui->difficultyLabel->setGeometry(30, 215, 210, 45);
-    ui->timerLabel->setGeometry(30, 275, 210, 45);
-    ui->backButton->setGeometry(30, 340, 210, 52);
+    ui->backButton->setGeometry(30, 295, 210, 52);
 
     ui->boardContainer->setGeometry(280, 80, 940, 620);
 
-    ui->boardTitleLabel->setAlignment(Qt::AlignCenter);
+    ui->boardTitleLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     ui->playerNameLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     ui->difficultyLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    ui->timerLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    ui->timerLabel->setAlignment(Qt::AlignCenter);
 
-    // Fuentes
     QFont titleFont = ui->boardTitleLabel->font();
-    titleFont.setPointSize(24);
+    titleFont.setPointSize(26);
     titleFont.setBold(true);
     ui->boardTitleLabel->setFont(titleFont);
 
@@ -86,21 +84,66 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
     infoFont.setBold(true);
     ui->playerNameLabel->setFont(infoFont);
     ui->difficultyLabel->setFont(infoFont);
-    ui->timerLabel->setFont(infoFont);
+
+    QFont timerFont = QFont("Courier New");
+    timerFont.setPointSize(18);
+    timerFont.setBold(true);
+    timerFont.setLetterSpacing(QFont::AbsoluteSpacing, 2.0);
+    ui->timerLabel->setFont(timerFont);
+
+    ui->boardTitleLabel->setStyleSheet(
+        "QLabel {"
+        "    color: #bfdbfe;"
+        "    background-color: #122033;"
+        "    border: 1px solid #1d3557;"
+        "    border-radius: 12px;"
+        "    padding: 0 14px;"
+        "}"
+        );
+
+    ui->playerNameLabel->setStyleSheet(
+        "QLabel {"
+        "    color: #dbeafe;"
+        "    background-color: #122033;"
+        "    border: 1px solid #1d3557;"
+        "    border-radius: 12px;"
+        "    padding: 0 14px;"
+        "}"
+        );
+
+    ui->difficultyLabel->setStyleSheet(
+        "QLabel {"
+        "    color: #bfdbfe;"
+        "    background-color: #122033;"
+        "    border: 1px solid #1d3557;"
+        "    border-radius: 12px;"
+        "    padding: 0 14px;"
+        "}"
+        );
+
+    ui->timerLabel->setStyleSheet(
+        "QLabel {"
+        "    color: #f8fafc;"
+        "    background-color: #0f1c2e;"
+        "    border: 2px solid #38bdf8;"
+        "    border-radius: 18px;"
+        "    padding: 0 18px;"
+        "}"
+        );
 
     QString buttonStyle =
         "QPushButton {"
-        "    background-color: #5b21b6;"
+        "    background-color: #1d4ed8;"
         "    color: white;"
-        "    border: 2px solid #a855f7;"
+        "    border: 2px solid #60a5fa;"
         "    border-radius: 14px;"
         "}"
         "QPushButton:hover {"
-        "    background-color: #7c3aed;"
-        "    border: 2px solid #c084fc;"
+        "    background-color: #2563eb;"
+        "    border: 2px solid #93c5fd;"
         "}"
         "QPushButton:pressed {"
-        "    background-color: #581c87;"
+        "    background-color: #1e40af;"
         "}";
 
     ui->backButton->setStyleSheet(buttonStyle);
@@ -108,7 +151,7 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-    connect(ui->backButton, &QPushButton::clicked, this, &GameForm::regresar);
+    connect(ui->backButton, &QPushButton::clicked, this, &GameForm::goBack);
 
     connect(&updateTimer, &QTimer::timeout, this, [this]() {
         qint64 elapsedMs = timer.elapsed();
@@ -117,7 +160,7 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
         int seconds = totalSeconds % 60;
 
         ui->timerLabel->setText(
-            QString("Tiempo: %1:%2")
+            QString("%1:%2")
                 .arg(minutes, 2, 10, QChar('0'))
                 .arg(seconds, 2, 10, QChar('0'))
             );
@@ -146,7 +189,7 @@ GameForm::GameForm(QString nombre, Difficulty difficulty, QWidget *parent)
     }
 
     ui->difficultyLabel->setText("Nivel: " + difficultyText );
-    ui->timerLabel->setText("Tiempo: 00:00");
+    ui->timerLabel->setText("00:00");
 
     crearTablero(filas, columnas);
 }
@@ -156,7 +199,7 @@ GameForm::~GameForm()
     delete ui;
 }
 
-void GameForm::regresar()
+void GameForm::goBack()
 {
     updateTimer.stop();
 

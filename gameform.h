@@ -48,7 +48,7 @@ public:
 private slots:
     void alHacerClickIzquierdo(int fila, int col);
     void alHacerClickDerecho(int fila, int col);
-    void regresar();
+    void goBack();
 
 private:
     Game game;
