@@ -8,11 +8,19 @@ Game::Game(Difficulty difficulty) : revealedNumber(0),flagsPlaced(0),
     start(difficulty);
 }
 
+Game::~Game()
+{
+}
+
 Game::Game(Difficulty difficulty, const RandomProvider& rndProvider) :
     revealedNumber(0), flagsPlaced(0), firstClick(true),
     rndProvider(rndProvider), board({0,0})
 {
     start(difficulty);
+}
+
+Game::RevealResult::~RevealResult()
+{
 }
 
 void Game::start(Difficulty difficulty)

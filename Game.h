@@ -16,6 +16,8 @@ public:
         //Vector que guarda indices revelados en un click
         //para que luego el GUI itere sobre el y repinte solo esos
         std::vector<int> changed;
+
+        ~RevealResult();
     };
 
 private:
@@ -41,6 +43,7 @@ private:
 public:
     Game(Difficulty difficulty);
     Game(Difficulty difficulty, const RandomProvider& rndProvider);
+    ~Game();
 
     void start(Difficulty difficulty);   
     void placeMines(int idx);

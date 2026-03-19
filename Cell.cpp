@@ -6,6 +6,10 @@ Cell::Cell() :
 {
 }
 
+Cell::~Cell()
+{
+}
+
 void Cell::incrementMinesAround(){
     minesAround++;
 }

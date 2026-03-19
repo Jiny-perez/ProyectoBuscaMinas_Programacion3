@@ -3,6 +3,7 @@
 
 #include "gameform.h"
 #include "mainwindow.h"
+#include "rankingform.h"
 
 #include <QApplication>
 #include <QtWidgets>
@@ -31,9 +32,7 @@ PlayerConfigurationForm::PlayerConfigurationForm(QString name, QWidget *parent)
     ui->welcomeLabel->setText("Bienvenido, " + playerName + ".");
     ui->welcomeLabel->setAlignment(Qt::AlignCenter);
     ui->welcomeLabel->setGeometry(275, 90, 550, 70);
-    ui->welcomeLabel->setStyleSheet(
-        "color: #d9e7ff;"
-        );
+    ui->welcomeLabel->setStyleSheet("color: #d9e7ff;");
 
     QFont welcomeFont = ui->welcomeLabel->font();
     welcomeFont.setPointSize(26);
@@ -127,7 +126,8 @@ void PlayerConfigurationForm::jugar()
 }
 
 void PlayerConfigurationForm::ranking(){
-    QMessageBox::information(this, "Ranking", "Todavia no esta disponible :c");
+    RankingForm form(this);
+    form.exec();
 }
 
 void PlayerConfigurationForm::regresarAMenu()

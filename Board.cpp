@@ -5,6 +5,10 @@ Board::Board(int rows, int columns) : rows(rows), columns(columns)
     grid.assign(rows*columns, Cell{});
 }
 
+Board::~Board()
+{
+}
+
 void Board::reset(Difficulty difficulty)
 {
     grid.clear();

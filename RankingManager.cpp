@@ -10,6 +10,10 @@ RankingManager::RankingManager(): filePath("ranking.json")
 
 }
 
+RankingManager::~RankingManager()
+{
+}
+
 void RankingManager::saveScore(const ScoreEntry &score)
 {
     std::vector<ScoreEntry> scores = loadScores();

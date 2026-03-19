@@ -14,6 +14,7 @@ private:
 public:
     RandomProvider();
     RandomProvider(const std::vector<int>& values);
+    ~RandomProvider();
 
     int nextInt(int min, int max);
 

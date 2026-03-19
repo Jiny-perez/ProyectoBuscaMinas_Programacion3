@@ -15,6 +15,10 @@ CellButton::CellButton(int fila, int col, QWidget *parent)
 {
 }
 
+CellButton::~CellButton()
+{
+}
+
 void CellButton::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
@@ -211,7 +215,7 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
             timer.start();
             timerStarted = true;
 
-            updateTimer.start();
+            updateTimer.start(250);
         }
 
         std::cout << "\nMINAS: " << game.getMinesNumber() << "\n";

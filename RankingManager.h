@@ -14,6 +14,7 @@ private:
 
 public:
     RankingManager();
+    ~RankingManager();
 
     void saveScore(const ScoreEntry& score);
 

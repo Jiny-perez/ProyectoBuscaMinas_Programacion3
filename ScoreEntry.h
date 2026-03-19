@@ -10,5 +10,7 @@ struct ScoreEntry
 
     Difficulty difficulty;
 
-    long long timeMs;
+    qint64 timeMs;
+
+    ~ScoreEntry();
 };

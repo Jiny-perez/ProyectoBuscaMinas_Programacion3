@@ -11,6 +11,7 @@
 #include <QElapsedTimer>
 #include <QCloseEvent>
 #include <QTimer>
+#include <QtTypes>
 
 
 class CellButton : public QPushButton
@@ -19,6 +20,7 @@ class CellButton : public QPushButton
 
 public:
     CellButton(int fila, int col, QWidget *parent = nullptr);
+    ~CellButton() override;
 
     int fila;
     int col;
@@ -61,7 +63,7 @@ private:
     RankingManager rankingMng;
     QElapsedTimer timer;
     bool timerStarted;
-    long long elapsedTimeMs;
+    qint64 elapsedTimeMs;
 
     QTimer updateTimer;
 

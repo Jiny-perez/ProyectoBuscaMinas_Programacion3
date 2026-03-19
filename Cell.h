@@ -11,6 +11,7 @@ private:
 
 public:
     Cell();
+    ~Cell();
 
     //GETTERS
     int getMinesAround() const;

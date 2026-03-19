@@ -9,6 +9,10 @@ RandomProvider::RandomProvider(const std::vector<int> &values)
 {
 }
 
+RandomProvider::~RandomProvider()
+{
+}
+
 int RandomProvider::nextInt(int min, int max)
 {
     if(!testMode)

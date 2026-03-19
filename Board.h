@@ -16,6 +16,7 @@ private:
 public:
 
     Board(int rows, int columns);
+    ~Board();
 
     void reset(Difficulty difficulty);
 

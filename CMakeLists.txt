@@ -36,7 +36,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Board.cpp
         gameform.h gameform.cpp gameform.ui
         playerconfigurationform.h playerconfigurationform.cpp playerconfigurationform.ui
+        rankingform.h
+        rankingform.cpp
         ScoreEntry.h
+        ScoreEntry.cpp
         RankingManager.h
         RankingManager.cpp
 
