@@ -34,6 +34,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Enums.h
         Board.h
         Board.cpp
+        CellButton.h
+        CellButton.cpp
+        BoardGUI.h
+        BoardGUI.cpp
         gameform.h gameform.cpp gameform.ui
         playerconfigurationform.h playerconfigurationform.cpp playerconfigurationform.ui
         rankingform.h

@@ -2,76 +2,20 @@
 #include "ui_gameform.h"
 
 #include <QFont>
-#include <QGridLayout>
-#include <QLayoutItem>
 #include <QMessageBox>
-#include <QStyle>
+#include <QVBoxLayout>
 
 #include <iostream>
-
-namespace {
-const char *hiddenCellState = "hidden";
-const char *revealedCellState = "revealed";
-const char *mineCellState = "mine";
-
-const char *cellStyles =
-    "QPushButton[cellState=\"hidden\"] {"
-    " background: #2e3250;"
-    " border: 1px solid #4a5080;"
-    " border-radius: 4px;"
-    "}"
-    "QPushButton[cellState=\"hidden\"]:hover {"
-    " background: #3d4470;"
-    " border: 1px solid #7ec8e3;"
-    "}"
-    "QPushButton[cellState=\"revealed\"] {"
-    " background: #0a3a1a;"
-    " border: 1px solid #44cc77;"
-    " border-radius: 4px;"
-    "}"
-    "QPushButton[cellState=\"mine\"] {"
-    " background: #5c0a0a;"
-    " border: 1px solid #ff4444;"
-    " border-radius: 4px;"
-    "}";
-}
-
-CellButton::CellButton(int fila, int col, QWidget *parent)
-    : QPushButton(parent), fila(fila), col(col)
-{
-}
-
-CellButton::~CellButton()
-{
-}
-
-void CellButton::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        emit clickIzquierdo(fila, col);
-        event->accept();
-        return;
-    }
-
-    if (event->button() == Qt::RightButton) {
-        emit clickDerecho(fila, col);
-        event->accept();
-        return;
-    }
-
-    QPushButton::mousePressEvent(event);
-}
 
 GameForm::GameForm(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::GameForm)
-    , filas(0)
-    , columnas(0)
+    , boardGui(nullptr)
     , timerStarted(false)
     , elapsedTimeMs(0)
-    , boardLayout(nullptr)
 {
     ui->setupUi(this);
+    boardGui = new BoardGUI(ui->boardContainer);
     setFixedSize(1140, 745);
     setAttribute(Qt::WA_StyledBackground, true);
 
@@ -83,24 +27,19 @@ GameForm::GameForm(QWidget *parent)
         "    background-color: transparent;"
         "}"
         );
-    ui->boardContainer->setStyleSheet(cellStyles);
 
     ui->boardTitleLabel->setGeometry(90, 18, 450, 46);
     ui->timerLabel->setGeometry(800, 18, 170, 46);
-
     ui->flagsCounterLabel->setGeometry(600, 18, 150, 46);
-
     ui->boardContainer->setGeometry(90, 74, 900, 590);
-
     ui->playerNameLabel->setGeometry(90, 684, 245, 38);
     ui->difficultyLabel->setGeometry(355, 684, 205, 38);
     ui->backButton->setGeometry(780, 679, 210, 46);
-    ui->restartButton->setGeometry(680,679,60,46);
+    ui->restartButton->setGeometry(650, 679, 90, 46);
 
     ui->boardTitleLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     ui->playerNameLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     ui->difficultyLabel->setAlignment(Qt::AlignCenter);
-
     ui->timerLabel->setAlignment(Qt::AlignCenter);
     ui->flagsCounterLabel->setAlignment(Qt::AlignCenter);
 
@@ -119,38 +58,35 @@ GameForm::GameForm(QWidget *parent)
     timerFont.setPointSize(16);
     timerFont.setBold(true);
     timerFont.setLetterSpacing(QFont::AbsoluteSpacing, 2.0);
-
     ui->timerLabel->setFont(timerFont);
     ui->flagsCounterLabel->setFont(timerFont);
 
-    QString labelsStyle =
+    const QString labelsStyle =
         "QLabel {"
         "    color: #bfdbfe;"
         "    background-color: #122033;"
         "    border: 1px solid #1d3557;"
         "    border-radius: 10px;"
         "    padding: 0 10px;"
-                          "}";
+        "}";
 
     ui->boardTitleLabel->setStyleSheet(labelsStyle);
-
     ui->playerNameLabel->setStyleSheet(labelsStyle);
-
     ui->difficultyLabel->setStyleSheet(labelsStyle);
 
-    QString countersStyle =
+    const QString countersStyle =
         "QLabel {"
         "    color: #f8fafc;"
         "    background-color: #0f1c2e;"
         "    border: 2px solid #38bdf8;"
         "    border-radius: 16px;"
         "    padding: 0 14px;"
-                            "}";
+        "}";
 
     ui->timerLabel->setStyleSheet(countersStyle);
     ui->flagsCounterLabel->setStyleSheet(countersStyle);
 
-    QString buttonsStyle =
+    const QString buttonsStyle =
         "QPushButton {"
         "    background-color: #1d4ed8;"
         "    color: white;"
@@ -164,20 +100,20 @@ GameForm::GameForm(QWidget *parent)
         "}"
         "QPushButton:pressed {"
         "    background-color: #1e40af;"
-                          "}";
+        "}";
 
     ui->backButton->setStyleSheet(buttonsStyle);
     ui->restartButton->setStyleSheet(buttonsStyle);
-
     ui->backButton->setFont(infoFont);
 
-    QFont smileyFaceFont = ui->playerNameLabel->font();
-    smileyFaceFont.setPointSize(22);
-    smileyFaceFont.setBold(true);
-    ui->restartButton->setFont(smileyFaceFont);
+    auto *boardContainerLayout = new QVBoxLayout(ui->boardContainer);
+    boardContainerLayout->setContentsMargins(0, 0, 0, 0);
+    boardContainerLayout->addWidget(boardGui, 0, Qt::AlignCenter);
 
     connect(ui->backButton, &QPushButton::clicked, this, &GameForm::goBack);
     connect(ui->restartButton, &QPushButton::clicked, this, &GameForm::restart);
+    connect(boardGui, &BoardGUI::leftCellClicked, this, &GameForm::alHacerClickIzquierdo);
+    connect(boardGui, &BoardGUI::rightCellClicked, this, &GameForm::alHacerClickDerecho);
 
     connect(&updateTimer, &QTimer::timeout, this, [this]() {
         const qint64 elapsedMs = timer.elapsed();
@@ -196,13 +132,11 @@ GameForm::GameForm(QWidget *parent)
     ui->playerNameLabel->setText("Jugador:");
     ui->difficultyLabel->setText("Nivel:");
     ui->timerLabel->setText("00:00");
-
-    ui->restartButton->setText("☻");
+    ui->restartButton->setText("Restart");
 }
 
 GameForm::~GameForm()
 {
-    limpiarTablero();
     delete ui;
 }
 
@@ -214,8 +148,8 @@ void GameForm::startGame(const QString &nombre, Difficulty difficulty)
     username = nombre;
     game = std::make_unique<Game>(difficulty);
 
-    filas = game->getBoard().getRows();
-    columnas = game->getBoard().getColumns();
+    const int filas = game->getBoard().getRows();
+    const int columnas = game->getBoard().getColumns();
 
     QString difficultyText;
     switch (difficulty) {
@@ -235,10 +169,8 @@ void GameForm::startGame(const QString &nombre, Difficulty difficulty)
     ui->difficultyLabel->setText("Nivel: " + difficultyText);
     ui->timerLabel->setText("00:00");
 
-    ui->flagsCounterLabel->setText("🚩"+QString::number(game->getMinesNumber()));
-
-    crearTablero(filas, columnas);
-    resetVisualGrid();
+    boardGui->setupBoard(filas, columnas);
+    uptadeFlagsCounter();
 }
 
 void GameForm::goBack()
@@ -249,100 +181,11 @@ void GameForm::goBack()
 
 void GameForm::restart()
 {
-    if(!game)
-        return;
-
-    Difficulty diff = game->getDifficulty();
-    startGame(username,diff);
-}
-
-void GameForm::crearTablero(int filas, int columnas)
-{
-    int tamCelda = 50;
-    if (columnas == 30) {
-        tamCelda = 28;
-    } else if (columnas == 16) {
-        tamCelda = 34;
-    }
-
-    const bool sameBoardSize = !celdas.isEmpty()
-        && celdas.size() == filas
-        && celdas[0].size() == columnas;
-
-    if (sameBoardSize) {
+    if (!game) {
         return;
     }
 
-    limpiarTablero();
-
-    boardLayout = new QGridLayout();
-    boardLayout->setSpacing(2);
-    boardLayout->setAlignment(Qt::AlignCenter);
-    ui->boardContainer->setLayout(boardLayout);
-
-    celdas.resize(filas);
-
-    for (int i = 0; i < filas; i++) {
-        celdas[i].resize(columnas);
-
-        for (int j = 0; j < columnas; j++) {
-            CellButton *celda = new CellButton(i, j, ui->boardContainer);
-            celda->setFixedSize(tamCelda, tamCelda);
-            celda->setFont(QFont("Segoe UI Emoji", tamCelda / 2));
-
-            connect(celda, &CellButton::clickIzquierdo, this, &GameForm::alHacerClickIzquierdo);
-            connect(celda, &CellButton::clickDerecho, this, &GameForm::alHacerClickDerecho);
-
-            resetCell(celda);
-            boardLayout->addWidget(celda, i, j);
-            celdas[i][j] = celda;
-        }
-    }
-}
-
-void GameForm::limpiarTablero()
-{
-    if (QLayout *layout = ui->boardContainer->layout()) {
-        while (QLayoutItem *item = layout->takeAt(0)) {
-            if (QWidget *widget = item->widget()) {
-                delete widget;
-            }
-            delete item;
-        }
-
-        delete layout;
-    }
-
-    celdas.clear();
-    boardLayout = nullptr;
-}
-
-void GameForm::resetVisualGrid()
-{
-    for (int i = 0; i < celdas.size(); ++i) {
-        for (int j = 0; j < celdas[i].size(); ++j) {
-            resetCell(celdas[i][j]);
-        }
-    }
-}
-
-void GameForm::resetCell(CellButton *celda)
-{
-    celda->setEnabled(true);
-    celda->setText("");
-    applyCellState(celda, hiddenCellState);
-}
-
-void GameForm::applyCellState(CellButton *celda, const char *state)
-{
-    if (celda->property("cellState").toString() == state) {
-        return;
-    }
-
-    celda->setProperty("cellState", state);
-    celda->style()->unpolish(celda);
-    celda->style()->polish(celda);
-    celda->update();
+    startGame(username, game->getDifficulty());
 }
 
 void GameForm::alHacerClickIzquierdo(int fila, int col)
@@ -353,9 +196,8 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
 
     const int totalColumnas = game->getBoard().getColumns();
     const int idx = fila * totalColumnas + col;
-    CellButton *celda = celdas[fila][col];
 
-    if (!celda->isEnabled() || game->isCellFlagged(idx)) {
+    if (!boardGui->isCellEnabled(fila, col) || game->isCellFlagged(idx)) {
         return;
     }
 
@@ -376,19 +218,9 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
     for (int changedIdx : result.changed) {
         const int f = changedIdx / totalColumnas;
         const int c = changedIdx % totalColumnas;
-        CellButton *btn = celdas[f][c];
         const auto &cell = game->getBoard().getCell(changedIdx);
 
-        if (cell.isMine()) {
-            btn->setText("💣");
-            applyCellState(btn, mineCellState);
-        } else {
-            const int minasAlrededor = cell.getMinesAround();
-            btn->setText(minasAlrededor > 0 ? QString::number(minasAlrededor) : "");
-            applyCellState(btn, revealedCellState);
-        }
-
-        btn->setEnabled(false);
+        boardGui->showRevealedCell(f, c, cell.getMinesAround(), cell.isMine());
     }
 
     if (result.outcome == RevealOutcome::BOMB) {
@@ -414,26 +246,27 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
 
 void GameForm::alHacerClickDerecho(int fila, int col)
 {
-    if (!game) {
-        return;
-    }
-
-    CellButton *celda = celdas[fila][col];
-    if (!celda->isEnabled()) {
+    if (!game || !boardGui->isCellEnabled(fila, col)) {
         return;
     }
 
     const int idx = fila * game->getBoard().getColumns() + col;
-    const bool isFlagged = game->getBoard().getCell(idx).isFlagged();
+    const bool wasFlagged = game->getBoard().getCell(idx).isFlagged();
 
     if (!game->toggleFlag(idx)) {
         return;
     }
 
-    celda->setText(isFlagged ? "" : "🚩");
+    boardGui->showFlaggedCell(fila, col, !wasFlagged);
+    uptadeFlagsCounter();
+}
 
-    int minesNumber = game->getMinesNumber();
-    int flagsPlaced = game->getFlagsPlaced();
+void GameForm::uptadeFlagsCounter() const
+{
+    if (!game) {
+        ui->flagsCounterLabel->clear();
+        return;
+    }
 
-    ui->flagsCounterLabel->setText("🚩"+QString::number(minesNumber-flagsPlaced));
+    ui->flagsCounterLabel->setText(QString::number(game->getMinesNumber() - game->getFlagsPlaced()));
 }
