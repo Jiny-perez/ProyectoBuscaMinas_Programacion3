@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QGridLayout>
+#include <QString>
 #include <QTimer>
 #include <QVector>
 #include <QWidget>
@@ -74,6 +75,7 @@ private:
     void limpiarTablero();
     void resetVisualGrid();
     void resetCell(CellButton *celda);
+    void applyCellState(CellButton *celda, const char *state);
 };
 
 #endif // GAMEFORM_H

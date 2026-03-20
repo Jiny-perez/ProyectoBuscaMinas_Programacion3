@@ -5,8 +5,36 @@
 #include <QGridLayout>
 #include <QLayoutItem>
 #include <QMessageBox>
+#include <QStyle>
 
 #include <iostream>
+
+namespace {
+const char *hiddenCellState = "hidden";
+const char *revealedCellState = "revealed";
+const char *mineCellState = "mine";
+
+const char *cellStyles =
+    "QPushButton[cellState=\"hidden\"] {"
+    " background: #2e3250;"
+    " border: 1px solid #4a5080;"
+    " border-radius: 4px;"
+    "}"
+    "QPushButton[cellState=\"hidden\"]:hover {"
+    " background: #3d4470;"
+    " border: 1px solid #7ec8e3;"
+    "}"
+    "QPushButton[cellState=\"revealed\"] {"
+    " background: #0a3a1a;"
+    " border: 1px solid #44cc77;"
+    " border-radius: 4px;"
+    "}"
+    "QPushButton[cellState=\"mine\"] {"
+    " background: #5c0a0a;"
+    " border: 1px solid #ff4444;"
+    " border-radius: 4px;"
+    "}";
+}
 
 CellButton::CellButton(int fila, int col, QWidget *parent)
     : QPushButton(parent), fila(fila), col(col)
@@ -55,6 +83,7 @@ GameForm::GameForm(QWidget *parent)
         "    background-color: transparent;"
         "}"
         );
+    ui->boardContainer->setStyleSheet(cellStyles);
 
     ui->boardTitleLabel->setGeometry(90, 18, 450, 46);
     ui->timerLabel->setGeometry(800, 18, 170, 46);
@@ -301,17 +330,19 @@ void GameForm::resetCell(CellButton *celda)
 {
     celda->setEnabled(true);
     celda->setText("");
-    celda->setStyleSheet(
-        "QPushButton {"
-        " background: #2e3250;"
-        " border: 1px solid #4a5080;"
-        " border-radius: 4px;"
-        "}"
-        "QPushButton:hover {"
-        " background: #3d4470;"
-        " border: 1px solid #7ec8e3;"
-        "}"
-        );
+    applyCellState(celda, hiddenCellState);
+}
+
+void GameForm::applyCellState(CellButton *celda, const char *state)
+{
+    if (celda->property("cellState").toString() == state) {
+        return;
+    }
+
+    celda->setProperty("cellState", state);
+    celda->style()->unpolish(celda);
+    celda->style()->polish(celda);
+    celda->update();
 }
 
 void GameForm::alHacerClickIzquierdo(int fila, int col)
@@ -350,15 +381,11 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
 
         if (cell.isMine()) {
             btn->setText("💣");
-            btn->setStyleSheet(
-                "QPushButton { background: #5c0a0a; border: 1px solid #ff4444; border-radius: 4px; }"
-                );
+            applyCellState(btn, mineCellState);
         } else {
             const int minasAlrededor = cell.getMinesAround();
             btn->setText(minasAlrededor > 0 ? QString::number(minasAlrededor) : "");
-            btn->setStyleSheet(
-                "QPushButton { background: #0a3a1a; border: 1px solid #44cc77; border-radius: 4px; }"
-                );
+            applyCellState(btn, revealedCellState);
         }
 
         btn->setEnabled(false);
