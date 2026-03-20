@@ -7,6 +7,7 @@
 #include <QElapsedTimer>
 #include <QMouseEvent>
 #include <QPushButton>
+#include <QGridLayout>
 #include <QTimer>
 #include <QVector>
 #include <QWidget>
@@ -67,9 +68,12 @@ private:
     qint64 elapsedTimeMs;
     QTimer updateTimer;
     QString username;
+    QGridLayout *boardLayout;
 
     void crearTablero(int filas, int columnas);
     void limpiarTablero();
+    void resetVisualGrid();
+    void resetCell(CellButton *celda);
 };
 
 #endif // GAMEFORM_H

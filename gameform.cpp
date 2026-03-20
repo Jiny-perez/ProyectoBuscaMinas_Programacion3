@@ -21,8 +21,14 @@ void CellButton::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         emit clickIzquierdo(fila, col);
-    } else if (event->button() == Qt::RightButton) {
+        event->accept();
+        return;
+    }
+
+    if (event->button() == Qt::RightButton) {
         emit clickDerecho(fila, col);
+        event->accept();
+        return;
     }
 
     QPushButton::mousePressEvent(event);
@@ -35,6 +41,7 @@ GameForm::GameForm(QWidget *parent)
     , columnas(0)
     , timerStarted(false)
     , elapsedTimeMs(0)
+    , boardLayout(nullptr)
 {
     ui->setupUi(this);
     setFixedSize(1140, 745);
@@ -201,8 +208,8 @@ void GameForm::startGame(const QString &nombre, Difficulty difficulty)
 
     ui->flagsCounterLabel->setText("🚩"+QString::number(game->getMinesNumber()));
 
-    limpiarTablero();
     crearTablero(filas, columnas);
+    resetVisualGrid();
 }
 
 void GameForm::goBack()
@@ -222,19 +229,29 @@ void GameForm::restart()
 
 void GameForm::crearTablero(int filas, int columnas)
 {
-    QGridLayout *grid = new QGridLayout();
-    grid->setSpacing(2);
-    grid->setAlignment(Qt::AlignCenter);
-    ui->boardContainer->setLayout(grid);
-
-    celdas.resize(filas);
-
     int tamCelda = 50;
     if (columnas == 30) {
         tamCelda = 28;
     } else if (columnas == 16) {
         tamCelda = 34;
     }
+
+    const bool sameBoardSize = !celdas.isEmpty()
+        && celdas.size() == filas
+        && celdas[0].size() == columnas;
+
+    if (sameBoardSize) {
+        return;
+    }
+
+    limpiarTablero();
+
+    boardLayout = new QGridLayout();
+    boardLayout->setSpacing(2);
+    boardLayout->setAlignment(Qt::AlignCenter);
+    ui->boardContainer->setLayout(boardLayout);
+
+    celdas.resize(filas);
 
     for (int i = 0; i < filas; i++) {
         celdas[i].resize(columnas);
@@ -243,22 +260,12 @@ void GameForm::crearTablero(int filas, int columnas)
             CellButton *celda = new CellButton(i, j, ui->boardContainer);
             celda->setFixedSize(tamCelda, tamCelda);
             celda->setFont(QFont("Segoe UI Emoji", tamCelda / 2));
-            celda->setStyleSheet(
-                "QPushButton {"
-                " background: #2e3250;"
-                " border: 1px solid #4a5080;"
-                " border-radius: 4px;"
-                "}"
-                "QPushButton:hover {"
-                " background: #3d4470;"
-                " border: 1px solid #7ec8e3;"
-                "}"
-                );
 
             connect(celda, &CellButton::clickIzquierdo, this, &GameForm::alHacerClickIzquierdo);
             connect(celda, &CellButton::clickDerecho, this, &GameForm::alHacerClickDerecho);
 
-            grid->addWidget(celda, i, j);
+            resetCell(celda);
+            boardLayout->addWidget(celda, i, j);
             celdas[i][j] = celda;
         }
     }
@@ -278,6 +285,33 @@ void GameForm::limpiarTablero()
     }
 
     celdas.clear();
+    boardLayout = nullptr;
+}
+
+void GameForm::resetVisualGrid()
+{
+    for (int i = 0; i < celdas.size(); ++i) {
+        for (int j = 0; j < celdas[i].size(); ++j) {
+            resetCell(celdas[i][j]);
+        }
+    }
+}
+
+void GameForm::resetCell(CellButton *celda)
+{
+    celda->setEnabled(true);
+    celda->setText("");
+    celda->setStyleSheet(
+        "QPushButton {"
+        " background: #2e3250;"
+        " border: 1px solid #4a5080;"
+        " border-radius: 4px;"
+        "}"
+        "QPushButton:hover {"
+        " background: #3d4470;"
+        " border: 1px solid #7ec8e3;"
+        "}"
+        );
 }
 
 void GameForm::alHacerClickIzquierdo(int fila, int col)
