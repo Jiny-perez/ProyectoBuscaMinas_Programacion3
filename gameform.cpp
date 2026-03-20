@@ -52,16 +52,21 @@ GameForm::GameForm(QWidget *parent)
     ui->boardTitleLabel->setGeometry(90, 18, 450, 46);
     ui->timerLabel->setGeometry(800, 18, 170, 46);
 
+    ui->flagsCounterLabel->setGeometry(600, 18, 150, 46);
+
     ui->boardContainer->setGeometry(90, 74, 900, 590);
 
     ui->playerNameLabel->setGeometry(90, 684, 245, 38);
     ui->difficultyLabel->setGeometry(355, 684, 205, 38);
     ui->backButton->setGeometry(780, 679, 210, 46);
+    ui->restartButton->setGeometry(680,679,60,46);
 
     ui->boardTitleLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     ui->playerNameLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     ui->difficultyLabel->setAlignment(Qt::AlignCenter);
+
     ui->timerLabel->setAlignment(Qt::AlignCenter);
+    ui->flagsCounterLabel->setAlignment(Qt::AlignCenter);
 
     QFont titleFont = ui->boardTitleLabel->font();
     titleFont.setPointSize(23);
@@ -78,49 +83,38 @@ GameForm::GameForm(QWidget *parent)
     timerFont.setPointSize(16);
     timerFont.setBold(true);
     timerFont.setLetterSpacing(QFont::AbsoluteSpacing, 2.0);
+
     ui->timerLabel->setFont(timerFont);
+    ui->flagsCounterLabel->setFont(timerFont);
 
-    ui->boardTitleLabel->setStyleSheet(
+    QString labelsStyle =
         "QLabel {"
         "    color: #bfdbfe;"
         "    background-color: #122033;"
         "    border: 1px solid #1d3557;"
         "    border-radius: 10px;"
         "    padding: 0 10px;"
-        "}"
-        );
+                          "}";
 
-    ui->playerNameLabel->setStyleSheet(
-        "QLabel {"
-        "    color: #dbeafe;"
-        "    background-color: #122033;"
-        "    border: 1px solid #1d3557;"
-        "    border-radius: 10px;"
-        "    padding: 0 10px;"
-        "}"
-        );
+    ui->boardTitleLabel->setStyleSheet(labelsStyle);
 
-    ui->difficultyLabel->setStyleSheet(
-        "QLabel {"
-        "    color: #bfdbfe;"
-        "    background-color: #122033;"
-        "    border: 1px solid #1d3557;"
-        "    border-radius: 10px;"
-        "    padding: 0 10px;"
-        "}"
-        );
+    ui->playerNameLabel->setStyleSheet(labelsStyle);
 
-    ui->timerLabel->setStyleSheet(
+    ui->difficultyLabel->setStyleSheet(labelsStyle);
+
+    QString countersStyle =
         "QLabel {"
         "    color: #f8fafc;"
         "    background-color: #0f1c2e;"
         "    border: 2px solid #38bdf8;"
         "    border-radius: 16px;"
         "    padding: 0 14px;"
-        "}"
-        );
+                            "}";
 
-    ui->backButton->setStyleSheet(
+    ui->timerLabel->setStyleSheet(countersStyle);
+    ui->flagsCounterLabel->setStyleSheet(countersStyle);
+
+    QString buttonsStyle =
         "QPushButton {"
         "    background-color: #1d4ed8;"
         "    color: white;"
@@ -134,12 +128,21 @@ GameForm::GameForm(QWidget *parent)
         "}"
         "QPushButton:pressed {"
         "    background-color: #1e40af;"
-        "}"
-        );
+                          "}";
+
+    ui->backButton->setStyleSheet(buttonsStyle);
+    ui->restartButton->setStyleSheet(buttonsStyle);
 
     ui->backButton->setFont(infoFont);
 
+    QFont smileyFaceFont = ui->playerNameLabel->font();
+    smileyFaceFont.setPointSize(22);
+    smileyFaceFont.setBold(true);
+    ui->restartButton->setFont(smileyFaceFont);
+
     connect(ui->backButton, &QPushButton::clicked, this, &GameForm::goBack);
+    connect(ui->restartButton, &QPushButton::clicked, this, &GameForm::restart);
+
     connect(&updateTimer, &QTimer::timeout, this, [this]() {
         const qint64 elapsedMs = timer.elapsed();
         const int totalSeconds = elapsedMs / 1000;
@@ -157,6 +160,8 @@ GameForm::GameForm(QWidget *parent)
     ui->playerNameLabel->setText("Jugador:");
     ui->difficultyLabel->setText("Nivel:");
     ui->timerLabel->setText("00:00");
+
+    ui->restartButton->setText("☻");
 }
 
 GameForm::~GameForm()
@@ -194,6 +199,8 @@ void GameForm::startGame(const QString &nombre, Difficulty difficulty)
     ui->difficultyLabel->setText("Nivel: " + difficultyText);
     ui->timerLabel->setText("00:00");
 
+    ui->flagsCounterLabel->setText("🚩"+QString::number(game->getMinesNumber()));
+
     limpiarTablero();
     crearTablero(filas, columnas);
 }
@@ -202,6 +209,15 @@ void GameForm::goBack()
 {
     updateTimer.stop();
     emit backRequested();
+}
+
+void GameForm::restart()
+{
+    if(!game)
+        return;
+
+    Difficulty diff = game->getDifficulty();
+    startGame(username,diff);
 }
 
 void GameForm::crearTablero(int filas, int columnas)
@@ -354,4 +370,9 @@ void GameForm::alHacerClickDerecho(int fila, int col)
     }
 
     celda->setText(isFlagged ? "" : "🚩");
+
+    int minesNumber = game->getMinesNumber();
+    int flagsPlaced = game->getFlagsPlaced();
+
+    ui->flagsCounterLabel->setText("🚩"+QString::number(minesNumber-flagsPlaced));
 }

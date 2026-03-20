@@ -53,6 +53,7 @@ private slots:
     void alHacerClickIzquierdo(int fila, int col);
     void alHacerClickDerecho(int fila, int col);
     void goBack();
+    void restart();
 
 private:
     std::unique_ptr<Game> game;
