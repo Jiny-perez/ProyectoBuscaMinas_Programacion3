@@ -1,37 +1,33 @@
 #include "playerconfigurationform.h"
 #include "ui_playerconfigurationform.h"
 
-#include "gameform.h"
-#include "mainwindow.h"
-#include "rankingform.h"
+#include <QComboBox>
+#include <QFont>
+#include <QLabel>
+#include <QPushButton>
 
-#include <QApplication>
-#include <QtWidgets>
-
-PlayerConfigurationForm::PlayerConfigurationForm(QString name, QWidget *parent)
-    : QDialog(parent)
+PlayerConfigurationForm::PlayerConfigurationForm(QWidget *parent)
+    : QWidget(parent)
     , ui(new Ui::PlayerConfigurationForm)
-    , playerName(name)
+    , difficultyLabel(nullptr)
+    , difficultyCombo(nullptr)
 {
     ui->setupUi(this);
-    ui->welcomeLabel->setText("Bienvenido, " + playerName + ".");
+    setFixedSize(1140, 745);
+    setAttribute(Qt::WA_StyledBackground, true);
 
-    setAttribute(Qt::WA_DeleteOnClose);
-
-    setFixedSize(1100, 760);
-
-    this->setStyleSheet(
-        "QDialog {"
-        "    background-color: #08111f;"
-        "}"
+    setStyleSheet(
         "QWidget#PlayerConfigurationForm {"
         "    background-color: #08111f;"
         "}"
+        "QLabel {"
+        "    color: #d9e7ff;"
+        "}"
         );
 
-    ui->welcomeLabel->setText("Bienvenido, " + playerName + ".");
+    ui->welcomeLabel->setText("Bienvenido.");
     ui->welcomeLabel->setAlignment(Qt::AlignCenter);
-    ui->welcomeLabel->setGeometry(275, 90, 550, 70);
+    ui->welcomeLabel->setGeometry(295, 80, 550, 70);
     ui->welcomeLabel->setStyleSheet("color: #d9e7ff;");
 
     QFont welcomeFont = ui->welcomeLabel->font();
@@ -39,9 +35,17 @@ PlayerConfigurationForm::PlayerConfigurationForm(QString name, QWidget *parent)
     welcomeFont.setBold(true);
     ui->welcomeLabel->setFont(welcomeFont);
 
-    ui->playButton->setGeometry(400, 260, 300, 70);
-    ui->rankingButton->setGeometry(400, 360, 300, 70);
-    ui->backToMenuButton->setGeometry(400, 460, 300, 70);
+    ui->playButton->setGeometry(420, 280, 300, 70);
+    ui->rankingButton->setGeometry(420, 380, 300, 70);
+    ui->backToMenuButton->setGeometry(420, 480, 300, 70);
+
+    difficultyLabel = new QLabel("Dificultad", this);
+    difficultyLabel->setAlignment(Qt::AlignCenter);
+    difficultyLabel->setGeometry(420, 170, 300, 35);
+
+    difficultyCombo = new QComboBox(this);
+    difficultyCombo->setGeometry(420, 210, 300, 42);
+    difficultyCombo->addItems({"Beginner", "Intermediate", "Expert"});
 
     QString buttonStyle =
         "QPushButton {"
@@ -62,6 +66,21 @@ PlayerConfigurationForm::PlayerConfigurationForm(QString name, QWidget *parent)
     ui->rankingButton->setStyleSheet(buttonStyle);
     ui->backToMenuButton->setStyleSheet(buttonStyle);
 
+    difficultyCombo->setStyleSheet(
+        "QComboBox {"
+        "    background-color: #111a2b;"
+        "    color: #f4f7ff;"
+        "    border: 2px solid #a855f7;"
+        "    border-radius: 10px;"
+        "    padding: 6px 10px;"
+        "}"
+        "QComboBox QAbstractItemView {"
+        "    background-color: #111a2b;"
+        "    color: #f4f7ff;"
+        "    selection-background-color: #5b21b6;"
+        "}"
+        );
+
     QFont buttonFont = ui->playButton->font();
     buttonFont.setPointSize(16);
     buttonFont.setBold(true);
@@ -69,9 +88,11 @@ PlayerConfigurationForm::PlayerConfigurationForm(QString name, QWidget *parent)
     ui->playButton->setFont(buttonFont);
     ui->rankingButton->setFont(buttonFont);
     ui->backToMenuButton->setFont(buttonFont);
+    difficultyLabel->setFont(buttonFont);
+    difficultyCombo->setFont(buttonFont);
 
     connect(ui->playButton, &QPushButton::clicked, this, &PlayerConfigurationForm::jugar);
-    connect(ui->rankingButton, &QPushButton::clicked, this, &PlayerConfigurationForm::ranking);
+    connect(ui->rankingButton, &QPushButton::clicked, this, &PlayerConfigurationForm::abrirRanking);
     connect(ui->backToMenuButton, &QPushButton::clicked, this, &PlayerConfigurationForm::regresarAMenu);
 }
 
@@ -80,61 +101,32 @@ PlayerConfigurationForm::~PlayerConfigurationForm()
     delete ui;
 }
 
-void PlayerConfigurationForm::closeEvent(QCloseEvent *event)
+void PlayerConfigurationForm::setPlayerName(const QString &name)
 {
-    if (!returningToParent) {
-        QApplication::quit();
-        return;
-    }
-
-    QDialog::closeEvent(event);
+    playerName = name;
+    ui->welcomeLabel->setText("Bienvenido, " + playerName + ".");
 }
 
 void PlayerConfigurationForm::jugar()
 {
-    Difficulty difficulty;
-    QStringList difficultyList;
-    difficultyList << "Beginner" << "Intermediate" << "Expert";
+    Difficulty difficulty = Difficulty::EXPERT;
+    const QString selectedDifficulty = difficultyCombo->currentText();
 
-    bool selectDifficulty;
-
-    QString difficulyDialog = QInputDialog::getItem(
-        this,
-        "Seleccionar dificultad",
-        "Dificultad:",
-        difficultyList,
-        0,
-        false,
-        &selectDifficulty
-        );
-
-    if(!selectDifficulty){
-        return;
-    }
-
-    if (difficulyDialog == "Beginner"){
+    if (selectedDifficulty == "Beginner") {
         difficulty = Difficulty::BEGINNER;
-    }else if (difficulyDialog == "Intermediate"){
+    } else if (selectedDifficulty == "Intermediate") {
         difficulty = Difficulty::INTERMEDIATE;
-    }else{
-        difficulty = Difficulty::EXPERT;
     }
 
-    GameForm *form = new GameForm(playerName, difficulty, this);
-    form->show();
-    this->hide();
+    emit playRequested(difficulty);
 }
 
-void PlayerConfigurationForm::ranking(){
-    RankingForm form(this);
-    form.exec();
+void PlayerConfigurationForm::abrirRanking()
+{
+    emit rankingRequested();
 }
 
 void PlayerConfigurationForm::regresarAMenu()
 {
-    if (parentWidget())
-        parentWidget()->show();
-
-    returningToParent = true;
-    close();
+    emit backRequested();
 }

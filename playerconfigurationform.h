@@ -1,32 +1,43 @@
 #ifndef PLAYERCONFIGURATIONFORM_H
 #define PLAYERCONFIGURATIONFORM_H
 
-#include <QCloseEvent>
-#include <QDialog>
+#include "Enums.h"
+
 #include <QString>
+#include <QWidget>
 
 namespace Ui {
 class PlayerConfigurationForm;
 }
 
-class PlayerConfigurationForm : public QDialog
+class QComboBox;
+class QLabel;
+
+class PlayerConfigurationForm : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PlayerConfigurationForm(QString name, QWidget *parent = nullptr);
+    explicit PlayerConfigurationForm(QWidget *parent = nullptr);
     ~PlayerConfigurationForm();
+
+    void setPlayerName(const QString &name);
+
+signals:
+    void playRequested(Difficulty difficulty);
+    void rankingRequested();
+    void backRequested();
 
 private slots:
     void jugar();
-    void ranking();
+    void abrirRanking();
     void regresarAMenu();
+
 private:
     Ui::PlayerConfigurationForm *ui;
     QString playerName;
-    bool returningToParent = false;
-
-    void closeEvent(QCloseEvent *event) override;
+    QLabel *difficultyLabel;
+    QComboBox *difficultyCombo;
 };
 
 #endif // PLAYERCONFIGURATIONFORM_H

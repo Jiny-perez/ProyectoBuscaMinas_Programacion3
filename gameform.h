@@ -4,15 +4,14 @@
 #include "Game.h"
 #include "RankingManager.h"
 
-#include <QDialog>
-#include <QPushButton>
-#include <QMouseEvent>
-#include <QVector>
 #include <QElapsedTimer>
-#include <QCloseEvent>
+#include <QMouseEvent>
+#include <QPushButton>
 #include <QTimer>
+#include <QVector>
+#include <QWidget>
 #include <QtTypes>
-
+#include <memory>
 
 class CellButton : public QPushButton
 {
@@ -37,13 +36,18 @@ namespace Ui {
 class GameForm;
 }
 
-class GameForm : public QDialog
+class GameForm : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit GameForm(QString nombre, Difficulty difficulty, QWidget *parent = nullptr);
+    explicit GameForm(QWidget *parent = nullptr);
     ~GameForm();
+
+    void startGame(const QString &nombre, Difficulty difficulty);
+
+signals:
+    void backRequested();
 
 private slots:
     void alHacerClickIzquierdo(int fila, int col);
@@ -51,30 +55,20 @@ private slots:
     void goBack();
 
 private:
-    Game game;
+    std::unique_ptr<Game> game;
     Ui::GameForm *ui;
     QVector<QVector<CellButton*>> celdas;
     int filas;
     int columnas;
-
-    bool modoTodos;
-
-    int nivelActual;
-
     RankingManager rankingMng;
     QElapsedTimer timer;
     bool timerStarted;
     qint64 elapsedTimeMs;
-
     QTimer updateTimer;
-
-    bool returningToWindow = false;
-
     QString username;
 
     void crearTablero(int filas, int columnas);
-
-    void closeEvent(QCloseEvent *event) override;
+    void limpiarTablero();
 };
 
 #endif // GAMEFORM_H
