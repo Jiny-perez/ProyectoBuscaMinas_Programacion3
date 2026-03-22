@@ -233,7 +233,6 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
         } else {
             startGame(username, game->getDifficulty(), currentMode);
         }
-
     } else if (result.outcome == RevealOutcome::WON) {
         updateTimer.stop();
         elapsedTimeMs = timer.elapsed();
