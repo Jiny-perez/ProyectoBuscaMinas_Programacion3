@@ -99,7 +99,7 @@ PlayerConfigurationForm::PlayerConfigurationForm(QWidget *parent)
     rbNormal->setFont(buttonFont);
     rbNormal->setChecked(true);
 
-    rbStory= new QRadioButton("Modo Historia", this);
+    rbStory= new QRadioButton("Modo Campaña", this);
     rbStory->setGeometry(600, 150, 200, 40);
     rbStory->setFont(buttonFont);
 

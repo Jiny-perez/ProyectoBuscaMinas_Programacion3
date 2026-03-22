@@ -7,7 +7,6 @@
 
 #include <QFont>
 #include <QMenuBar>
-#include <QMessageBox>
 #include <QStackedWidget>
 #include <QStatusBar>
 
@@ -42,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->nameLabel->setGeometry(370, 170, 400, 45);
 
     ui->nameField->setGeometry(370, 225, 400, 55);
+    ui->nameValidationLabel->setGeometry(395, 298, 350, 28);
     ui->startBttn->setGeometry(420, 330, 300, 70);
     ui->exitButton->setGeometry(420, 430, 300, 70);
 
@@ -55,6 +55,21 @@ MainWindow::MainWindow(QWidget *parent)
     QFont labelFont = ui->nameLabel->font();
     labelFont.setPointSize(15);
     ui->nameLabel->setFont(labelFont);
+    ui->nameValidationLabel->setAlignment(Qt::AlignCenter);
+    QFont validationFont = ui->nameValidationLabel->font();
+    validationFont.setPointSize(11);
+    validationFont.setBold(true);
+    ui->nameValidationLabel->setFont(validationFont);
+    ui->nameValidationLabel->setStyleSheet(
+        "QLabel {"
+        "    color: #fca5a5;"
+        "    background-color: #2b1115;"
+        "    border: 1px solid #ef4444;"
+        "    border-radius: 10px;"
+        "    padding: 0 8px;"
+        "}"
+        );
+    ui->nameValidationLabel->hide();
 
     ui->nameField->setStyleSheet(
         "background-color: #111a2b;"
@@ -99,6 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->titleLabel->setParent(startPage);
     ui->nameLabel->setParent(startPage);
     ui->nameField->setParent(startPage);
+    ui->nameValidationLabel->setParent(startPage);
     ui->startBttn->setParent(startPage);
     ui->exitButton->setParent(startPage);
 
@@ -120,6 +136,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(configurationPage, &PlayerConfigurationForm::backRequested, this, &MainWindow::showStartPage);
     connect(gamePage, &GameForm::backRequested, this, &MainWindow::showConfigurationPage);
     connect(rankingPage, &RankingForm::backRequested, this, &MainWindow::showConfigurationPage);
+    connect(ui->nameField, &QTextEdit::textChanged, this, &MainWindow::clearNameValidationMessage);
 
     stackedWidget->setCurrentWidget(startPage);
 }
@@ -134,10 +151,11 @@ void MainWindow::on_startBttn_clicked()
     const QString name = ui->nameField->toPlainText().trimmed();
 
     if (name.isEmpty()) {
-        QMessageBox::warning(this, "Validacion", "Debe ingresar su nombre");
+        showNameValidationMessage("Debe ingresar su nombre para continuar.");
         return;
     }
 
+    clearNameValidationMessage();
     playerName = name;
     configurationPage->setPlayerName(playerName);
     showConfigurationPage();
@@ -150,6 +168,8 @@ void MainWindow::on_exitButton_clicked()
 
 void MainWindow::showStartPage()
 {
+    ui->nameValidationLabel->clear();
+    ui->nameValidationLabel->hide();
     stackedWidget->setCurrentWidget(startPage);
 }
 
@@ -169,4 +189,20 @@ void MainWindow::showRankingPage()
 {
     rankingPage->refreshScores();
     stackedWidget->setCurrentWidget(rankingPage);
+}
+
+void MainWindow::clearNameValidationMessage()
+{
+    if (ui->nameField->toPlainText().trimmed().isEmpty()) {
+        return;
+    }
+
+    ui->nameValidationLabel->clear();
+    ui->nameValidationLabel->hide();
+}
+
+void MainWindow::showNameValidationMessage(const QString &message)
+{
+    ui->nameValidationLabel->setText(message);
+    ui->nameValidationLabel->show();
 }

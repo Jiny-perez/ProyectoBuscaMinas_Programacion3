@@ -2,7 +2,6 @@
 #include "ui_gameform.h"
 
 #include <QFont>
-#include <QMessageBox>
 #include <QVBoxLayout>
 
 #include <iostream>
@@ -31,7 +30,8 @@ GameForm::GameForm(QWidget *parent)
     ui->boardTitleLabel->setGeometry(90, 18, 450, 46);
     ui->timerLabel->setGeometry(800, 18, 170, 46);
     ui->flagsCounterLabel->setGeometry(600, 18, 150, 46);
-    ui->boardContainer->setGeometry(90, 74, 900, 590);
+    ui->boardContainer->setGeometry(90, 74, 900, 530);
+    ui->statusLabel->setGeometry(90, 616, 900, 46);
     ui->playerNameLabel->setGeometry(90, 684, 245, 38);
     ui->difficultyLabel->setGeometry(355, 684, 205, 38);
     ui->backButton->setGeometry(780, 679, 210, 46);
@@ -42,6 +42,7 @@ GameForm::GameForm(QWidget *parent)
     ui->difficultyLabel->setAlignment(Qt::AlignCenter);
     ui->timerLabel->setAlignment(Qt::AlignCenter);
     ui->flagsCounterLabel->setAlignment(Qt::AlignCenter);
+    ui->statusLabel->setAlignment(Qt::AlignCenter);
 
     QFont titleFont = ui->boardTitleLabel->font();
     titleFont.setPointSize(23);
@@ -53,6 +54,7 @@ GameForm::GameForm(QWidget *parent)
     infoFont.setBold(true);
     ui->playerNameLabel->setFont(infoFont);
     ui->difficultyLabel->setFont(infoFont);
+    ui->statusLabel->setFont(infoFont);
 
     QFont timerFont("Courier New");
     timerFont.setPointSize(16);
@@ -85,6 +87,14 @@ GameForm::GameForm(QWidget *parent)
 
     ui->timerLabel->setStyleSheet(countersStyle);
     ui->flagsCounterLabel->setStyleSheet(countersStyle);
+    ui->statusLabel->setStyleSheet(
+        "QLabel {"
+        "    background-color: #122033;"
+        "    border: 1px solid #1d3557;"
+        "    border-radius: 12px;"
+        "    padding: 0 12px;"
+        "}"
+        );
 
     const QString buttonsStyle =
         "QPushButton {"
@@ -133,6 +143,7 @@ GameForm::GameForm(QWidget *parent)
     ui->difficultyLabel->setText("Nivel:");
     ui->timerLabel->setText("00:00");
     ui->restartButton->setText("Restart");
+    clearStatusMessage();
 }
 
 GameForm::~GameForm()
@@ -142,12 +153,25 @@ GameForm::~GameForm()
 
 void GameForm::startGame(const QString &nombre, Difficulty difficulty, GameMode modo)
 {
+    username = nombre;
+    currentMode = modo;
+    currentDifficulty = difficulty;
+    currentLevel = 1;
+    pendingStoryAdvance = false;
+    storyCompleted = false;
+    loadGame(difficulty);
+}
+
+void GameForm::loadGame(Difficulty difficulty)
+{
     updateTimer.stop();
     timerStarted = false;
     elapsedTimeMs = 0;
-    username = nombre;
-    currentMode = modo;
+    gameFinished = false;
     game = std::make_unique<Game>(difficulty);
+    clearStatusMessage();
+    boardGui->setEnabled(true);
+    ui->restartButton->setEnabled(true);
 
     const int filas = game->getBoard().getRows();
     const int columnas = game->getBoard().getColumns();
@@ -166,7 +190,7 @@ void GameForm::startGame(const QString &nombre, Difficulty difficulty, GameMode 
     }
 
     ui->boardTitleLabel->setText("Buscaminas " + QString::number(filas) + "x" + QString::number(columnas));
-    ui->playerNameLabel->setText("Jugador: " + nombre);
+    ui->playerNameLabel->setText("Jugador: " + username);
     ui->difficultyLabel->setText("Nivel: " + difficultyText);
     ui->timerLabel->setText("00:00");
 
@@ -186,7 +210,18 @@ void GameForm::restart()
         return;
     }
 
-    startGame(username, game->getDifficulty(), currentMode);
+    if (storyCompleted) {
+        emit backRequested();
+        return;
+    }
+
+    if (pendingStoryAdvance) {
+        pendingStoryAdvance = false;
+        loadGame(currentDifficulty);
+        return;
+    }
+
+    loadGame(game->getDifficulty());
 }
 
 void GameForm::alHacerClickIzquierdo(int fila, int col)
@@ -198,7 +233,7 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
     const int totalColumnas = game->getBoard().getColumns();
     const int idx = fila * totalColumnas + col;
 
-    if (!boardGui->isCellEnabled(fila, col) || game->isCellFlagged(idx)) {
+    if (gameFinished || !boardGui->isEnabled() || !boardGui->isCellEnabled(fila, col) || game->isCellFlagged(idx)) {
         return;
     }
 
@@ -226,16 +261,14 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
 
     if (result.outcome == RevealOutcome::BOMB) {
         updateTimer.stop();
-        QMessageBox::information(this, "Fin del juego", "Perdiste");
-
-        if (currentMode == GameMode::STORY) {
-            startGame(username, currentDifficulty, currentMode);
-        } else {
-            startGame(username, game->getDifficulty(), currentMode);
-        }
+        gameFinished = true;
+        boardGui->setEnabled(false);
+        showStatusMessage("Perdiste la partida. Presiona Restart para intentarlo de nuevo.", StatusType::Loss);
     } else if (result.outcome == RevealOutcome::WON) {
         updateTimer.stop();
         elapsedTimeMs = timer.elapsed();
+        gameFinished = true;
+        boardGui->setEnabled(false);
 
         ScoreEntry score;
         score.username = username;
@@ -245,9 +278,7 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
 
         std::cout << "\n" << elapsedTimeMs << "\n";
 
-        QMessageBox::information(this, "Victoria", "Ganaste");
-
-        if(currentMode == GameMode::STORY){
+        if (currentMode == GameMode::STORY) {
             currentLevel++;
 
             switch (currentLevel) {
@@ -261,21 +292,23 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
                 currentDifficulty = Difficulty::EXPERT;
                 break;
             default:
-                QMessageBox::information(this, "Historia", "¡Felicidades. Completaste todos los niveles!");
-                emit backRequested();
+                storyCompleted = true;
+                ui->restartButton->setEnabled(false);
+                showStatusMessage("Ganaste. Felicidades, completaste todos los niveles de la campaña.", StatusType::Win);
                 return;
             }
 
-            startGame(username, currentDifficulty, currentMode);
+            pendingStoryAdvance = true;
+            showStatusMessage("Ganaste esta ronda. Presiona Restart para avanzar al siguiente nivel.", StatusType::Win);
         } else {
-            emit backRequested();
+            showStatusMessage("Ganaste la partida. Puedes presionar Restart para jugar otra vez.", StatusType::Win);
         }
     }
 }
 
 void GameForm::alHacerClickDerecho(int fila, int col)
 {
-    if (!game || !boardGui->isCellEnabled(fila, col)) {
+    if (!game || gameFinished || !boardGui->isEnabled() || !boardGui->isCellEnabled(fila, col)) {
         return;
     }
 
@@ -298,4 +331,41 @@ void GameForm::uptadeFlagsCounter() const
     }
 
     ui->flagsCounterLabel->setText(QString::number(game->getMinesNumber() - game->getFlagsPlaced()));
+}
+
+void GameForm::showStatusMessage(const QString &message, StatusType type)
+{
+    QString textColor = "#bfdbfe";
+    QString borderColor = "#1d3557";
+    QString backgroundColor = "#122033";
+
+    if (type == StatusType::Win) {
+        textColor = "#86efac";
+        borderColor = "#22c55e";
+        backgroundColor = "#0d2216";
+    } else if (type == StatusType::Loss) {
+        textColor = "#fca5a5";
+        borderColor = "#ef4444";
+        backgroundColor = "#2b1115";
+    }
+
+    ui->statusLabel->setStyleSheet(
+        QString(
+            "QLabel {"
+            "    color: %1;"
+            "    background-color: %2;"
+            "    border: 1px solid %3;"
+            "    border-radius: 12px;"
+            "    padding: 0 12px;"
+            "}"
+            ).arg(textColor, backgroundColor, borderColor)
+        );
+    ui->statusLabel->setText(message);
+    ui->statusLabel->show();
+}
+
+void GameForm::clearStatusMessage()
+{
+    ui->statusLabel->clear();
+    ui->statusLabel->hide();
 }

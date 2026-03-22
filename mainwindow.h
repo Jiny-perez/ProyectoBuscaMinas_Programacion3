@@ -33,6 +33,7 @@ private slots:
     void showConfigurationPage();
     void showGamePage(Difficulty difficulty, GameMode modo);
     void showRankingPage();
+    void clearNameValidationMessage();
 
 private:
     Ui::MainWindow *ui;
@@ -42,6 +43,8 @@ private:
     GameForm *gamePage;
     RankingForm *rankingPage;
     QString playerName;
+
+    void showNameValidationMessage(const QString &message);
 };
 
 #endif // MAINWINDOW_H

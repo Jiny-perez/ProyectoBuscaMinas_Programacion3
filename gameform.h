@@ -6,6 +6,7 @@
 #include "RankingManager.h"
 
 #include <QElapsedTimer>
+#include <QLabel>
 #include <QString>
 #include <QTimer>
 #include <QWidget>
@@ -35,6 +36,12 @@ private slots:
     void restart();
 
 private:
+    enum class StatusType {
+        None,
+        Win,
+        Loss
+    };
+
     std::unique_ptr<Game> game;
     Ui::GameForm *ui;
     BoardGUI *boardGui;
@@ -48,7 +55,13 @@ private:
     GameMode currentMode;
     Difficulty currentDifficulty;
     int currentLevel = 1;
+    bool gameFinished = false;
+    bool pendingStoryAdvance = false;
+    bool storyCompleted = false;
 
+    void loadGame(Difficulty difficulty);
+    void showStatusMessage(const QString &message, StatusType type);
+    void clearStatusMessage();
     void uptadeFlagsCounter() const;
 };
 
