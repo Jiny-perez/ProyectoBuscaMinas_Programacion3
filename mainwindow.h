@@ -31,7 +31,7 @@ private slots:
     void on_exitButton_clicked();
     void showStartPage();
     void showConfigurationPage();
-    void showGamePage(Difficulty difficulty);
+    void showGamePage(Difficulty difficulty, GameMode modo);
     void showRankingPage();
 
 private:

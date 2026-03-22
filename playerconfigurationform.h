@@ -12,6 +12,7 @@ class PlayerConfigurationForm;
 
 class QComboBox;
 class QLabel;
+class QRadioButton;
 
 class PlayerConfigurationForm : public QWidget
 {
@@ -24,7 +25,7 @@ public:
     void setPlayerName(const QString &name);
 
 signals:
-    void playRequested(Difficulty difficulty);
+    void playRequested(Difficulty difficulty, GameMode mode);
     void rankingRequested();
     void backRequested();
 
@@ -32,12 +33,18 @@ private slots:
     void jugar();
     void abrirRanking();
     void regresarAMenu();
+    void actualizarModo();
 
 private:
     Ui::PlayerConfigurationForm *ui;
+
     QString playerName;
+
     QLabel *difficultyLabel;
     QComboBox *difficultyCombo;
+
+    QRadioButton *rbNormal;
+    QRadioButton *rbStory;
 };
 
 #endif // PLAYERCONFIGURATIONFORM_H

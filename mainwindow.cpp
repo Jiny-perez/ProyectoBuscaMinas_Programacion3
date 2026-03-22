@@ -159,9 +159,9 @@ void MainWindow::showConfigurationPage()
     stackedWidget->setCurrentWidget(configurationPage);
 }
 
-void MainWindow::showGamePage(Difficulty difficulty)
+void MainWindow::showGamePage(Difficulty difficulty, GameMode modo)
 {
-    gamePage->startGame(playerName, difficulty);
+    gamePage->startGame(playerName, difficulty, modo);
     stackedWidget->setCurrentWidget(gamePage);
 }
 

@@ -23,7 +23,7 @@ public:
     explicit GameForm(QWidget *parent = nullptr);
     ~GameForm();
 
-    void startGame(const QString &nombre, Difficulty difficulty);
+    void startGame(const QString &nombre, Difficulty difficulty, GameMode modo);
 
 signals:
     void backRequested();
@@ -44,6 +44,10 @@ private:
     qint64 elapsedTimeMs;
     QTimer updateTimer;
     QString username;
+
+    GameMode currentMode;
+    Difficulty currentDifficulty;
+    int currentLevel = 1;
 
     void uptadeFlagsCounter() const;
 };

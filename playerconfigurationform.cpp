@@ -5,6 +5,9 @@
 #include <QFont>
 #include <QLabel>
 #include <QPushButton>
+#include <QRadioButton>
+#include <QButtonGroup>
+
 
 PlayerConfigurationForm::PlayerConfigurationForm(QWidget *parent)
     : QWidget(parent)
@@ -27,7 +30,7 @@ PlayerConfigurationForm::PlayerConfigurationForm(QWidget *parent)
 
     ui->welcomeLabel->setText("Bienvenido.");
     ui->welcomeLabel->setAlignment(Qt::AlignCenter);
-    ui->welcomeLabel->setGeometry(295, 80, 550, 70);
+    ui->welcomeLabel->setGeometry(295, 50, 550, 70);
     ui->welcomeLabel->setStyleSheet("color: #d9e7ff;");
 
     QFont welcomeFont = ui->welcomeLabel->font();
@@ -35,16 +38,16 @@ PlayerConfigurationForm::PlayerConfigurationForm(QWidget *parent)
     welcomeFont.setBold(true);
     ui->welcomeLabel->setFont(welcomeFont);
 
-    ui->playButton->setGeometry(420, 280, 300, 70);
-    ui->rankingButton->setGeometry(420, 380, 300, 70);
-    ui->backToMenuButton->setGeometry(420, 480, 300, 70);
+    ui->playButton->setGeometry(420, 350, 300, 70);
+    ui->rankingButton->setGeometry(420, 450, 300, 70);
+    ui->backToMenuButton->setGeometry(420, 550, 300, 70);
 
     difficultyLabel = new QLabel("Dificultad", this);
     difficultyLabel->setAlignment(Qt::AlignCenter);
-    difficultyLabel->setGeometry(420, 170, 300, 35);
+    difficultyLabel->setGeometry(420, 200, 300, 35);
 
     difficultyCombo = new QComboBox(this);
-    difficultyCombo->setGeometry(420, 210, 300, 42);
+    difficultyCombo->setGeometry(420, 250, 300, 42);
     difficultyCombo->addItems({"Beginner", "Intermediate", "Expert"});
 
     QString buttonStyle =
@@ -58,7 +61,7 @@ PlayerConfigurationForm::PlayerConfigurationForm(QWidget *parent)
         "    background-color: #7c3aed;"
         "    border: 2px solid #c084fc;"
         "}"
-        "QPushButton:pressed {"
+            "QPushButton:pressed {"
         "    background-color: #581c87;"
         "}";
 
@@ -91,9 +94,27 @@ PlayerConfigurationForm::PlayerConfigurationForm(QWidget *parent)
     difficultyLabel->setFont(buttonFont);
     difficultyCombo->setFont(buttonFont);
 
+    rbNormal = new QRadioButton("Modo Libre", this);
+    rbNormal->setGeometry(350, 150, 150, 40);
+    rbNormal->setFont(buttonFont);
+    rbNormal->setChecked(true);
+
+    rbStory= new QRadioButton("Modo Historia", this);
+    rbStory->setGeometry(600, 150, 200, 40);
+    rbStory->setFont(buttonFont);
+
+    QButtonGroup *modeGroup = new QButtonGroup(this);
+    modeGroup->addButton(rbNormal, 0);
+    modeGroup->addButton(rbStory, 1);
+
     connect(ui->playButton, &QPushButton::clicked, this, &PlayerConfigurationForm::jugar);
     connect(ui->rankingButton, &QPushButton::clicked, this, &PlayerConfigurationForm::abrirRanking);
     connect(ui->backToMenuButton, &QPushButton::clicked, this, &PlayerConfigurationForm::regresarAMenu);
+
+    connect(rbNormal, &QRadioButton::toggled, this, &PlayerConfigurationForm::actualizarModo);
+    connect(rbStory, &QRadioButton::toggled, this, &PlayerConfigurationForm::actualizarModo);
+
+    actualizarModo();
 }
 
 PlayerConfigurationForm::~PlayerConfigurationForm()
@@ -107,18 +128,36 @@ void PlayerConfigurationForm::setPlayerName(const QString &name)
     ui->welcomeLabel->setText("Bienvenido, " + playerName + ".");
 }
 
+void PlayerConfigurationForm::actualizarModo()
+{
+    if (rbNormal->isChecked()) {
+        difficultyLabel->setEnabled(true);
+        difficultyCombo->setEnabled(true);
+    } else {
+        difficultyLabel->setEnabled(false);
+        difficultyCombo->setEnabled(false);
+    }
+}
+
 void PlayerConfigurationForm::jugar()
 {
-    Difficulty difficulty = Difficulty::EXPERT;
-    const QString selectedDifficulty = difficultyCombo->currentText();
+    Difficulty difficulty = Difficulty::BEGINNER;
 
-    if (selectedDifficulty == "Beginner") {
-        difficulty = Difficulty::BEGINNER;
-    } else if (selectedDifficulty == "Intermediate") {
-        difficulty = Difficulty::INTERMEDIATE;
+    if (rbNormal->isChecked()) {
+        const QString selectedDifficulty = difficultyCombo->currentText();
+
+        if (selectedDifficulty == "Beginner") {
+            difficulty = Difficulty::BEGINNER;
+        } else if (selectedDifficulty == "Intermediate") {
+            difficulty = Difficulty::INTERMEDIATE;
+        } else if (selectedDifficulty == "Expert") {
+            difficulty = Difficulty::EXPERT;
+        }
     }
 
-    emit playRequested(difficulty);
+    GameMode modo = rbStory->isChecked() ? GameMode::STORY : GameMode::NORMAL;
+
+    emit playRequested(difficulty, modo);
 }
 
 void PlayerConfigurationForm::abrirRanking()

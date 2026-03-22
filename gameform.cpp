@@ -140,12 +140,13 @@ GameForm::~GameForm()
     delete ui;
 }
 
-void GameForm::startGame(const QString &nombre, Difficulty difficulty)
+void GameForm::startGame(const QString &nombre, Difficulty difficulty, GameMode modo)
 {
     updateTimer.stop();
     timerStarted = false;
     elapsedTimeMs = 0;
     username = nombre;
+    currentMode = modo;
     game = std::make_unique<Game>(difficulty);
 
     const int filas = game->getBoard().getRows();
@@ -185,7 +186,7 @@ void GameForm::restart()
         return;
     }
 
-    startGame(username, game->getDifficulty());
+    startGame(username, game->getDifficulty(), currentMode);
 }
 
 void GameForm::alHacerClickIzquierdo(int fila, int col)
@@ -226,7 +227,13 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
     if (result.outcome == RevealOutcome::BOMB) {
         updateTimer.stop();
         QMessageBox::information(this, "Fin del juego", "Perdiste");
-        emit backRequested();
+
+        if (currentMode == GameMode::STORY) {
+            startGame(username, currentDifficulty, currentMode);
+        } else {
+            startGame(username, game->getDifficulty(), currentMode);
+        }
+
     } else if (result.outcome == RevealOutcome::WON) {
         updateTimer.stop();
         elapsedTimeMs = timer.elapsed();
@@ -240,7 +247,30 @@ void GameForm::alHacerClickIzquierdo(int fila, int col)
         std::cout << "\n" << elapsedTimeMs << "\n";
 
         QMessageBox::information(this, "Victoria", "Ganaste");
-        emit backRequested();
+
+        if(currentMode == GameMode::STORY){
+            currentLevel++;
+
+            switch (currentLevel) {
+            case 1:
+                currentDifficulty = Difficulty::BEGINNER;
+                break;
+            case 2:
+                currentDifficulty = Difficulty::INTERMEDIATE;
+                break;
+            case 3:
+                currentDifficulty = Difficulty::EXPERT;
+                break;
+            default:
+                QMessageBox::information(this, "Historia", "¡Felicidades. Completaste todos los niveles!");
+                emit backRequested();
+                return;
+            }
+
+            startGame(username, currentDifficulty, currentMode);
+        } else {
+            emit backRequested();
+        }
     }
 }
 

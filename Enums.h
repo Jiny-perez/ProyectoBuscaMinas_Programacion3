@@ -14,3 +14,8 @@ enum class Difficulty
     INTERMEDIATE,
     EXPERT
 };
+
+enum class GameMode {
+    NORMAL,
+    STORY
+};
