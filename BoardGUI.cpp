@@ -19,9 +19,43 @@ const char *cellStyles =
     " border: 1px solid #7ec8e3;"
     "}"
     "QPushButton[cellState=\"revealed\"] {"
-    " background: #0a3a1a;"
-    " border: 1px solid #44cc77;"
+    " background: #182033;"
+    " border: 1px solid #7b8db8;"
     " border-radius: 4px;"
+    " color: #dbeafe;"
+    " font-weight: 700;"
+    "}"
+    "QPushButton[cellState=\"revealed\"][dangerLevel=\"1\"] {"
+    " border-radius: 4px;"
+    " color: #60A5FA;"
+    "}"
+    "QPushButton[cellState=\"revealed\"][dangerLevel=\"2\"] {"
+    " border-radius: 4px;"
+    " color: #3B82F6;"
+    "}"
+    "QPushButton[cellState=\"revealed\"][dangerLevel=\"3\"] {"
+    " border-radius: 4px;"
+    " color: #6366F1;"
+    "}"
+    "QPushButton[cellState=\"revealed\"][dangerLevel=\"4\"] {"
+    " border-radius: 4px;"
+    " color: #8B5CF6;"
+    "}"
+    "QPushButton[cellState=\"revealed\"][dangerLevel=\"5\"] {"
+    " border-radius: 4px;"
+    " color: #A855F7;"
+    "}"
+    "QPushButton[cellState=\"revealed\"][dangerLevel=\"6\"] {"
+    " border-radius: 4px;"
+    " color: #A855F7;"
+    "}"
+    "QPushButton[cellState=\"revealed\"][dangerLevel=\"7\"] {"
+    " border-radius: 4px;"
+    " color: #A855F7;"
+    "}"
+    "QPushButton[cellState=\"revealed\"][dangerLevel=\"8\"] {"
+    " border-radius: 4px;"
+    " color: #A855F7;"
     "}"
     "QPushButton[cellState=\"mine\"] {"
     " background: #5c0a0a;"
@@ -102,6 +136,7 @@ void BoardGUI::showRevealedCell(int fila, int col, int minasAlrededor, bool isMi
         applyCellState(btn, mineCellState);
     } else {
         btn->setText(minasAlrededor > 0 ? QString::number(minasAlrededor) : "");
+        btn->setProperty("dangerLevel", minasAlrededor);
         applyCellState(btn, revealedCellState);
     }
 
@@ -130,6 +165,7 @@ void BoardGUI::resetCell(CellButton *celda)
 {
     celda->setEnabled(true);
     celda->setText("");
+    celda->setProperty("dangerLevel", 0);
     applyCellState(celda, hiddenCellState);
 }
 
@@ -152,7 +188,7 @@ int BoardGUI::cellSizeForColumns(int columnas) const
     }
 
     if (columnas == 16) {
-        return 34;
+        return 30;
     }
 
     return 50;
