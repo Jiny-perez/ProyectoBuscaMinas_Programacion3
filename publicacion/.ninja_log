@@ -1,0 +1,21 @@
+# ninja log v6
+5	808	7959415506469403	Proyecto_Buscaminas_autogen/timestamp	44b3e591b3a4acb
+5	808	7959415506469403	Proyecto_Buscaminas_autogen/mocs_compilation.cpp	44b3e591b3a4acb
+5	808	7959415506469403	C:/C++/Proyecto_Buscaminas/build/Release/Proyecto_Buscaminas_autogen/timestamp	44b3e591b3a4acb
+5	808	7959415506469403	C:/C++/Proyecto_Buscaminas/build/Release/Proyecto_Buscaminas_autogen/mocs_compilation.cpp	44b3e591b3a4acb
+838	1028	7959415507422888	CMakeFiles/Proyecto_Buscaminas.dir/Cell.cpp.obj	86bf5a3be9333aec
+863	1233	7959415507710486	CMakeFiles/Proyecto_Buscaminas.dir/RandomProvider.cpp.obj	b3a648bc267f6b26
+850	1331	7959415507583284	CMakeFiles/Proyecto_Buscaminas.dir/Game.cpp.obj	5722e7cc14992535
+876	1371	7959415507799847	CMakeFiles/Proyecto_Buscaminas.dir/Board.cpp.obj	321ad9ad131b7e28
+963	2365	7959415508727804	CMakeFiles/Proyecto_Buscaminas.dir/ScoreEntry.cpp.obj	7be4462ebd794729
+820	3192	7959415507266050	CMakeFiles/Proyecto_Buscaminas.dir/main.cpp.obj	d5f5db182f990ece
+889	3334	7959415507972247	CMakeFiles/Proyecto_Buscaminas.dir/CellButton.cpp.obj	8d3ccb771fb8e642
+1005	3548	7959415509084537	CMakeFiles/Proyecto_Buscaminas.dir/creditsform.cpp.obj	8a493602a9e7a880
+980	3562	7959415508900683	CMakeFiles/Proyecto_Buscaminas.dir/RankingManager.cpp.obj	39e1258e304b93cd
+827	3608	7959415507266050	CMakeFiles/Proyecto_Buscaminas.dir/mainwindow.cpp.obj	318a93be5d9500bb
+813	3671	7959415507109013	CMakeFiles/Proyecto_Buscaminas.dir/Proyecto_Buscaminas_autogen/mocs_compilation.cpp.obj	62cb638813b1a452
+904	3678	7959415508080532	CMakeFiles/Proyecto_Buscaminas.dir/BoardGUI.cpp.obj	3aa6bd3e2bc090cb
+917	3734	7959415508259497	CMakeFiles/Proyecto_Buscaminas.dir/gameform.cpp.obj	c1cd1f1bb9f0d6b3
+948	3796	7959415508547481	CMakeFiles/Proyecto_Buscaminas.dir/rankingform.cpp.obj	9a491883559b26e6
+933	3917	7959415508373981	CMakeFiles/Proyecto_Buscaminas.dir/playerconfigurationform.cpp.obj	2c8471ac692bd156
+3917	4088	7959415538207464	Proyecto_Buscaminas.exe	f4aa972253429c31
