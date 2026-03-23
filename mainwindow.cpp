@@ -4,6 +4,7 @@
 #include "gameform.h"
 #include "playerconfigurationform.h"
 #include "rankingform.h"
+#include "creditsform.h"
 
 #include <QFont>
 #include <QMenuBar>
@@ -18,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     , configurationPage(nullptr)
     , gamePage(nullptr)
     , rankingPage(nullptr)
+    , creditsPage(nullptr)
 {
     ui->setupUi(this);
     setFixedSize(1140, 745);
@@ -125,17 +127,21 @@ MainWindow::MainWindow(QWidget *parent)
     configurationPage = new PlayerConfigurationForm(this);
     gamePage = new GameForm(this);
     rankingPage = new RankingForm(this);
+    creditsPage = new CreditsForm(this);
 
     stackedWidget->addWidget(configurationPage);
     stackedWidget->addWidget(gamePage);
     stackedWidget->addWidget(rankingPage);
+    stackedWidget->addWidget(creditsPage);
     setCentralWidget(stackedWidget);
 
     connect(configurationPage, &PlayerConfigurationForm::playRequested, this, &MainWindow::showGamePage);
     connect(configurationPage, &PlayerConfigurationForm::rankingRequested, this, &MainWindow::showRankingPage);
+    connect(configurationPage, &PlayerConfigurationForm::creditsRequested, this, &MainWindow::showCreditsPage);
     connect(configurationPage, &PlayerConfigurationForm::backRequested, this, &MainWindow::showStartPage);
     connect(gamePage, &GameForm::backRequested, this, &MainWindow::showConfigurationPage);
     connect(rankingPage, &RankingForm::backRequested, this, &MainWindow::showConfigurationPage);
+    connect(creditsPage, &CreditsForm::backRequested, this, &MainWindow::showConfigurationPage);
     connect(ui->nameField, &QTextEdit::textChanged, this, &MainWindow::clearNameValidationMessage);
 
     stackedWidget->setCurrentWidget(startPage);
@@ -189,6 +195,11 @@ void MainWindow::showRankingPage()
 {
     rankingPage->refreshScores();
     stackedWidget->setCurrentWidget(rankingPage);
+}
+
+void MainWindow::showCreditsPage()
+{
+    stackedWidget->setCurrentWidget(creditsPage);
 }
 
 void MainWindow::clearNameValidationMessage()

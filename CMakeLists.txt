@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Proyecto_Buscaminas VERSION 0.1 LANGUAGES CXX)
+project(Proyecto_Buscaminas VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -46,6 +46,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ScoreEntry.cpp
         RankingManager.h
         RankingManager.cpp
+        creditsform.h
+        creditsform.cpp
 
     )
 # Define target properties for Android with Qt 6 as:
@@ -90,5 +92,25 @@ install(TARGETS Proyecto_Buscaminas
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
+    qt_generate_deploy_app_script(
+        TARGET Proyecto_Buscaminas
+        OUTPUT_SCRIPT deploy_script
+        NO_UNSUPPORTED_PLATFORM_ERROR
+    )
+    install(SCRIPT ${deploy_script})
     qt_finalize_executable(Proyecto_Buscaminas)
 endif()
+
+set(CPACK_PACKAGE_NAME "Buscaminas")
+set(CPACK_PACKAGE_VENDOR "Proyecto Buscaminas")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Juego de Buscaminas hecho con Qt")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "Buscaminas")
+
+set(CPACK_GENERATOR "ZIP")
+find_program(MAKENSIS_EXECUTABLE makensis)
+if(MAKENSIS_EXECUTABLE)
+    list(APPEND CPACK_GENERATOR "NSIS")
+endif()
+
+include(CPack)

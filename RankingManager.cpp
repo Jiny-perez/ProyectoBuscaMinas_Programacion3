@@ -1,13 +1,24 @@
 #include "RankingManager.h"
 
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QStandardPaths>
 
-RankingManager::RankingManager(): filePath("ranking.json")
+RankingManager::RankingManager()
 {
+    const QString appDataDir =
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    filePath = QDir(appDataDir).filePath("ranking.json");
 
+    const QString legacyPath = "ranking.json";
+    if (!QFileInfo::exists(filePath) && QFileInfo::exists(legacyPath)) {
+        QDir().mkpath(appDataDir);
+        QFile::copy(legacyPath, filePath);
+    }
 }
 
 RankingManager::~RankingManager()
@@ -119,5 +130,7 @@ std::vector<ScoreEntry> RankingManager::loadScoresDifficulty(Difficulty difficul
 
 QString RankingManager::getPath() const
 {
+    const QFileInfo fileInfo(filePath);
+    QDir().mkpath(fileInfo.absolutePath());
     return filePath;
 }

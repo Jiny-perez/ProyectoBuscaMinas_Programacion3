@@ -12,6 +12,7 @@ class PlayerConfigurationForm;
 
 class QComboBox;
 class QLabel;
+class QPushButton;
 class QRadioButton;
 
 class PlayerConfigurationForm : public QWidget
@@ -27,11 +28,14 @@ public:
 signals:
     void playRequested(Difficulty difficulty, GameMode mode);
     void rankingRequested();
+    void creditsRequested();
     void backRequested();
 
 private slots:
     void jugar();
     void abrirRanking();
+    void abrirAyuda();
+    void solicitarCreditos();
     void regresarAMenu();
     void actualizarModo();
 
@@ -42,6 +46,8 @@ private:
 
     QLabel *difficultyLabel;
     QComboBox *difficultyCombo;
+    QPushButton *helpButton;
+    QPushButton *creditsButton;
 
     QRadioButton *rbNormal;
     QRadioButton *rbStory;

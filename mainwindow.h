@@ -14,6 +14,7 @@ QT_END_NAMESPACE
 
 class GameForm;
 class PlayerConfigurationForm;
+class CreditsForm;
 class QStackedWidget;
 class RankingForm;
 class QWidget;
@@ -42,9 +43,11 @@ private:
     PlayerConfigurationForm *configurationPage;
     GameForm *gamePage;
     RankingForm *rankingPage;
+    CreditsForm *creditsPage;
     QString playerName;
 
     void showNameValidationMessage(const QString &message);
+    void showCreditsPage();
 };
 
 #endif // MAINWINDOW_H
